@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Yousef Zaqout | Senior Backend Engineer</title>
+    <meta
+      name="description"
+      content="Laravel RESTful APIs, payment & AI/RAG pipelines, OpenAPI docs, Docker delivery."
+    />
+    <meta name="author" content="Yousef Zaqout" />
+
+    <!--
+      Open Graph / Twitter — %VITE_SITE_URL% / %VITE_OG_IMAGE% injected at build time.
+      Modes: .env (dev), .env.staging, .env.production
+    -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Yousef Zaqout" />
+    <meta property="og:title" content="Yousef Zaqout | Senior Backend Engineer" />
+    <meta
+      property="og:description"
+      content="Laravel RESTful APIs, payment & AI/RAG pipelines, OpenAPI docs, Docker delivery."
+    />
+    <meta property="og:image" content="%VITE_OG_IMAGE%" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Yousef Zaqout | Senior Backend Engineer" />
+    <meta property="og:url" content="%VITE_SITE_URL%/" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale:alternate" content="ar_AR" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Yousef Zaqout | Senior Backend Engineer" />
+    <meta
+      name="twitter:description"
+      content="Laravel RESTful APIs, payment & AI/RAG pipelines, OpenAPI docs, Docker delivery."
+    />
+    <meta name="twitter:image" content="%VITE_OG_IMAGE%" />
+    <meta name="twitter:image:alt" content="Yousef Zaqout | Senior Backend Engineer" />
+
+    <link rel="canonical" href="%VITE_SITE_URL%/" />
+    <link rel="icon" href="./assets/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon-32.png" />
+    <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png" />
+
+    <!-- Analytics: set keys before analytics.js loads (leave empty to no-op / console.debug) -->
+    <script>
+      window.YZ_ANALYTICS = {
+        ga4Id: "", // e.g. "G-XXXXXXXXXX"
+        posthogKey: "", // e.g. "phc_xxxxxxxx"
+        posthogHost: "https://us.i.posthog.com",
+        debug: false,
+      };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&family=Readex+Pro:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./css/styles.css" />
+  </head>
+  <body>
+    <div class="page-atmosphere" aria-hidden="true">
+      <div class="glow glow-a"></div>
+      <div class="glow glow-b"></div>
+      <div class="glow glow-c"></div>
+      <div class="grid-overlay"></div>
+    </div>
+
+    <a class="skip-link" href="#top">Skip to content</a>
+
+    <header class="site-header">
+      <div class="telemetry-bar" aria-live="polite">
+        <span class="telemetry-dot" aria-hidden="true"></span>
+        <span data-i18n="telemetry.status">All API Systems Operational</span>
+        <span class="telemetry-sep" aria-hidden="true">|</span>
+        <span dir="ltr"
+          ><span data-i18n="telemetry.edge">Edge Latency</span>: <bdi dir="ltr" id="telemetry-edge">18ms</bdi></span
+        >
+        <span class="telemetry-sep" aria-hidden="true">|</span>
+        <span dir="ltr"><span data-i18n="telemetry.uptime">Uptime</span>: <bdi dir="ltr">99.98%</bdi></span>
+      </div>
+      <div class="nav-shell">
+        <a href="#top" class="logo" data-i18n="brand">Yousef Zaqout</a>
+        <nav class="nav-links" id="primary-nav" aria-label="Primary">
+          <a href="#problems" data-i18n="nav.problems">Problems</a>
+          <a href="#services" data-i18n="nav.services">Services</a>
+          <a href="#work" data-i18n="nav.work">Work</a>
+          <a href="#rigor" data-i18n="nav.rigor">Rigor</a>
+          <a href="#why" data-i18n="nav.why">Why Me</a>
+          <a href="#contact" data-i18n="nav.contact">Contact</a>
+        </nav>
+        <div class="nav-actions">
+          <button
+            type="button"
+            class="icon-btn cmd-hotkey-btn"
+            id="cmd-open"
+            aria-label="Open command palette"
+            title="Open command palette"
+          >
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+              <path d="M4 7h16M4 12h10M4 17h14" />
+            </svg>
+            <kbd class="hotkey-badge" id="cmd-hotkey" dir="ltr">Ctrl+K</kbd>
+          </button>
+          <button type="button" class="icon-btn" id="audio-toggle" aria-label="Toggle keypress sound" aria-pressed="true">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+              <path d="M11 5L6 9H3v6h3l5 4V5z" />
+              <path class="audio-wave" d="M15 9a4 4 0 010 6M18 7a7 7 0 010 10" />
+            </svg>
+          </button>
+          <div class="lang-toggle" role="group" aria-label="Language">
+            <button type="button" data-lang="en" class="is-active" aria-pressed="true">EN</button>
+            <button type="button" data-lang="ar" aria-pressed="false">عر</button>
+          </div>
+          <a
+            class="btn btn-primary btn-nav"
+            href="https://wa.me/972594803033"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-i18n="nav.cta"
+            data-track="cta_whatsapp"
+            data-track-location="nav"
+            >Book a Call</a
+          >
+          <button class="menu-toggle" type="button" aria-label="Menu" aria-controls="primary-nav" aria-expanded="false">
+            <span></span><span></span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main id="top">
+      <!-- HERO -->
+      <section class="hero" aria-label="Hero">
+        <div class="hero-bg" aria-hidden="true">
+          <img src="./assets/images/bg-hero-office.png" alt="" width="1920" height="1080" fetchpriority="high" />
+        </div>
+        <div class="container hero-grid">
+          <div class="hero-copy">
+            <p class="eyebrow">
+              <span class="status-dot" aria-hidden="true"></span>
+              <span data-i18n="hero.eyebrow"> Backend Engineer · REST API Specialist</span>
+            </p>
+            <h1 class="hero-title" data-i18n="hero.headline">Backend systems built for speed.</h1>
+            <p class="hero-lead" data-i18n="hero.lead">
+              Laravel RESTful APIs, payment &amp; AI/RAG pipelines, OpenAPI docs, Docker delivery.
+            </p>
+            <div class="hero-ctas">
+              <a
+                class="btn btn-primary btn-glow"
+                href="https://wa.me/972594803033"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-i18n="hero.ctaPrimary"
+                data-track="cta_whatsapp"
+                data-track-location="hero"
+                >Book a Discovery Call</a
+              >
+              <a class="btn-text" href="#work" data-i18n="hero.ctaSecondary">View projects →</a>
+            </div>
+            <div class="tech-logos" id="tech-stack" aria-label="Tech stack">
+              <button type="button" class="tech-logo" title="Laravel">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#FF2D20" d="M23.642 5.43l-11.508 19.2L.66 5.43h6.982l4.492 7.492L16.66 5.43z"/></svg>
+                <span>Laravel</span>
+              </button>
+              <button type="button" class="tech-logo" title="PostgreSQL">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4169E1" d="M12 2C7.6 2 4.5 4.8 4.5 8.6c0 2.8 1.5 5.1 3.7 6.8v3.1c0 .5.4.9.9.9h5.8c.5 0 .9-.4.9-.9v-3.1c2.2-1.7 3.7-4 3.7-6.8C19.5 4.8 16.4 2 12 2zm-1.6 16.5h3.2v1.2h-3.2v-1.2zm1.6-13c2.6 0 4.5 1.6 4.5 3.6S14.6 12.7 12 12.7 7.5 11.1 7.5 9.1 9.4 5.5 12 5.5z"/></svg>
+                <span>PostgreSQL</span>
+              </button>
+              <button type="button" class="tech-logo" title="Redis">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#DC382D" d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.2L19.2 8 12 11.8 4.8 8 12 4.2zM4 9.5l7 3.7v7.1L4 16.6V9.5zm9 10.8v-7.1l7-3.7v7.1l-7 3.7z"/></svg>
+                <span>Redis</span>
+              </button>
+              <button type="button" class="tech-logo" title="Docker">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#2496ED" d="M4.2 10.2h2.1v2.1H4.2zm2.7 0h2.1v2.1H6.9zm2.7 0h2.1v2.1H9.6zm2.7 0h2.1v2.1h-2.1zM6.9 7.5h2.1v2.1H6.9zm2.7 0h2.1v2.1H9.6zm2.7 0h2.1v2.1h-2.1zM9.6 4.8h2.1v2.1H9.6zm7.8 6.8c-.2-.1-.5-.1-.8 0-.1-1.3-1.4-1.9-1.4-1.9s.1.9-.4 1.7c-.4.6-1.1.9-1.1.9l.2.4s1.5-.2 2.5.6c.9.7.9 1.9.9 1.9H22s-.2-3.1-2.6-3.6zM3.5 13.2h17.2v.4c0 2.5-2.3 5.1-8.6 5.1S3.5 16.1 3.5 13.6v-.4z"/></svg>
+                <span>Docker</span>
+              </button>
+              <button type="button" class="tech-logo" title="OpenAI">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#10A37F" d="M22.3 10.1a5.4 5.4 0 0 0-.5-4.9 5.5 5.5 0 0 0-5.9-2.6A5.5 5.5 0 0 0 6.5 1.3 5.5 5.5 0 0 0 1.7 5a5.4 5.4 0 0 0-2 3.7 5.5 5.5 0 0 0 1.8 5.2 5.4 5.4 0 0 0 .5 4.9 5.5 5.5 0 0 0 5.9 2.6 5.5 5.5 0 0 0 9.4 1.3 5.5 5.5 0 0 0 4.8-3.7 5.4 5.4 0 0 0 2-3.7 5.5 5.5 0 0 0-1.8-5.2z"/></svg>
+                <span>OpenAI</span>
+              </button>
+              <button type="button" class="tech-logo" title="Stripe">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#635BFF" d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 7.667 0 4.59 2.367 4.59 6.27c0 4.407 3.573 5.95 6.69 7.133 2.43.903 3.246 1.536 3.246 2.515 0 .965-.84 1.545-2.274 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c4.78 0 8.083-2.358 8.083-6.338 0-4.462-3.571-5.98-5.821-8.512z"/></svg>
+                <span>Stripe</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="hero-visual">
+            <div class="ide-stack">
+              <!-- VS Code-style frame -->
+              <div class="ide-frame">
+                <div class="ide-titlebar">
+                  <div class="ide-dots" aria-hidden="true">
+                    <span class="dot red"></span>
+                    <span class="dot yellow"></span>
+                    <span class="dot green"></span>
+                  </div>
+                  <span class="ide-tab" dir="ltr"><bdi dir="ltr">routes/api.php</bdi></span>
+                  <button type="button" class="copy-btn" data-copy-target="hero-snippet" data-i18n-aria="hero.copy" aria-label="Copy code">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                      <rect x="9" y="9" width="11" height="11" rx="2" />
+                      <path d="M5 15V5a2 2 0 0 1 2-2h10" />
+                    </svg>
+                    <span data-i18n="hero.copy">Copy</span>
+                  </button>
+                </div>
+                <div class="ide-body" dir="ltr">
+                  <pre id="hero-snippet" class="ide-code"><code><span class="c-line"><span class="c-gutter">1</span><span class="c-muted">// Cached · Indexed · Documented</span></span>
+<span class="c-line"><span class="c-gutter">2</span><span class="c-key">Route</span>::<span class="c-fn">middleware</span>([<span class="c-str">'auth:sanctum'</span>])</span>
+<span class="c-line"><span class="c-gutter">3</span>  -&gt;<span class="c-fn">get</span>(<span class="c-str">'/v1/metrics'</span>, <bdi dir="ltr">MetricsController::<span class="c-fn">class</span></bdi>);</span>
+<span class="c-line"><span class="c-gutter">4</span></span>
+<span class="c-line"><span class="c-gutter">5</span><span class="c-key">return</span> <span class="c-fn">cache</span>()-&gt;<span class="c-fn">remember</span>(<span class="c-str">'metrics'</span>, <span class="c-num">60</span>, <span class="c-fn">fn</span> () =&gt;</span>
+<span class="c-line"><span class="c-gutter">6</span>  Metric::<span class="c-fn">query</span>()-&gt;<span class="c-fn">indexed</span>()-&gt;<span class="c-fn">get</span>()</span>
+<span class="c-line"><span class="c-gutter">7</span>);</span></code></pre>
+                </div>
+              </div>
+
+              <!-- API Sandbox Terminal -->
+              <div class="api-sandbox" id="api-sandbox">
+                <div class="sandbox-bar">
+                  <span class="sandbox-label" data-i18n="sandbox.label">API Sandbox</span>
+                  <span class="sandbox-badge" dir="ltr"><bdi dir="ltr">GET /v1/metrics</bdi></span>
+                </div>
+                <div class="sandbox-body" dir="ltr">
+                  <div class="endpoint-switcher overflow-x-auto" role="tablist" aria-label="Endpoints">
+                    <button type="button" class="ep-btn is-active" data-endpoint="metrics" role="tab">
+                      <span class="ep-method get">GET</span>
+                      <bdi dir="ltr">/v1/metrics</bdi>
+                    </button>
+                    <button type="button" class="ep-btn" data-endpoint="rag" role="tab">
+                      <span class="ep-method post">POST</span>
+                      <bdi dir="ltr">/v1/ai/rag-search</bdi>
+                    </button>
+                    <button type="button" class="ep-btn" data-endpoint="stripe" role="tab">
+                      <span class="ep-method post">POST</span>
+                      <bdi dir="ltr">/v1/checkout/stripe</bdi>
+                    </button>
+                  </div>
+
+                  <div class="cache-toggle" role="group" aria-label="Cache mode">
+                    <button type="button" class="cache-btn is-active" data-cache="cold" data-i18n="sandbox.cold">
+                      Cold DB Query
+                    </button>
+                    <button type="button" class="cache-btn" data-cache="hit" data-i18n="sandbox.cached">
+                      Redis Cache Hit
+                    </button>
+                  </div>
+
+                  <div class="sandbox-body-wrap" id="sandbox-body-wrap" hidden>
+                    <label class="sandbox-field-label" for="sandbox-body-input" data-i18n="sandbox.payload"
+                      >JSON Payload</label
+                    >
+                    <textarea
+                      id="sandbox-body-input"
+                      class="sandbox-payload"
+                      spellcheck="false"
+                      rows="4"
+                      disabled
+                    ></textarea>
+                  </div>
+
+                  <div class="sandbox-prompt">
+                    <span class="sandbox-prompt-sign">$</span>
+                    <code id="sandbox-curl-preview" class="overflow-x-auto" dir="ltr"><bdi dir="ltr">curl https://api.demo/v1/metrics</bdi></code>
+                    <button type="button" class="btn btn-glass btn-sm" id="copy-curl">
+                      <span data-i18n="sandbox.copyCurl">Copy as cURL</span>
+                    </button>
+                    <button type="button" class="btn btn-primary btn-sm" id="run-api" data-i18n="sandbox.run">
+                      Run
+                    </button>
+                  </div>
+                  <pre
+                    class="sandbox-output overflow-x-auto"
+                    id="sandbox-output"
+                    dir="ltr"
+                    aria-live="polite"
+                  ><span class="c-muted" data-i18n="sandbox.hint">Press Run to hit a mock endpoint…</span></pre>
+                  <div class="sandbox-meta" id="sandbox-meta" hidden>
+                    <span class="latency-pill"
+                      ><span data-i18n="sandbox.latency">Latency</span> <bdi dir="ltr" id="sandbox-ms">—</bdi></span
+                    >
+                    <span class="status-pill" id="sandbox-status" dir="ltr"><bdi dir="ltr">200 OK</bdi></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- METRICS -->
+      <section class="metrics" aria-label="Results">
+        <div class="container metrics-grid">
+          <article class="metric-card reveal">
+            <strong><bdi dir="ltr" data-i18n="proof.p1Title">&lt; 150ms</bdi></strong>
+            <span data-i18n-tech="proof.p1Text">API Response Time — PostgreSQL indexing &amp; Redis caching</span>
+          </article>
+          <article class="metric-card reveal reveal-delay-1">
+            <strong data-i18n-html="proof.p2Title"><bdi dir="ltr">80% Faster</bdi></strong>
+            <span data-i18n-tech="proof.p2Text">Deployment Setup — optimized Docker environments</span>
+          </article>
+          <article class="metric-card reveal reveal-delay-2">
+            <strong data-i18n-html="proof.p3Title"><bdi dir="ltr">&lt; 5s</bdi></strong>
+            <span data-i18n-tech="proof.p3Text">Real-time Telegram Alerts — automated scraping pipelines</span>
+          </article>
+          <article class="metric-card reveal reveal-delay-3">
+            <strong><bdi dir="ltr" data-i18n="proof.p4Title">100%</bdi></strong>
+            <span data-i18n-tech="proof.p4Text">Production-Ready API Docs — Postman &amp; Swagger/OpenAPI</span>
+          </article>
+        </div>
+      </section>
+
+      <!-- PROBLEMS -->
+      <section class="problems" id="problems">
+        <div class="container">
+          <div class="section-head reveal">
+            <span class="section-badge" data-i18n="problems.label">Where Founders Get Stuck</span>
+            <h2 data-i18n="problems.title">Your product is ready. Your backend is the bottleneck.</h2>
+            <p data-i18n="problems.lead">
+              I work with startup founders, CTOs, and frontend/mobile teams who need a backend they can trust under real
+              users.
+            </p>
+          </div>
+          <div class="problem-grid">
+            <article class="problem-card reveal" data-problem>
+              <div class="problem-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                  <path d="M12 8v5" /><circle cx="12" cy="16" r="0.8" fill="currentColor" stroke="none" />
+                  <path d="M10.3 4.5h3.4L20 18.5H4L10.3 4.5z" />
+                </svg>
+              </div>
+              <p class="num">01</p>
+              <h3></h3>
+              <p class="problem-body"></p>
+            </article>
+            <article class="problem-card reveal reveal-delay-1" data-problem>
+              <div class="problem-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                  <rect x="3" y="6" width="18" height="12" rx="2" />
+                  <path d="M3 10h18" /><path d="M7 15h4" />
+                </svg>
+              </div>
+              <p class="num">02</p>
+              <h3></h3>
+              <p class="problem-body"></p>
+            </article>
+            <article class="problem-card reveal" data-problem>
+              <div class="problem-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                  <path d="M4 19V5" /><path d="M4 19h16" />
+                  <path d="M8 15l3-4 3 2 4-6" />
+                </svg>
+              </div>
+              <p class="num">03</p>
+              <h3></h3>
+              <p class="problem-body"></p>
+            </article>
+            <article class="problem-card reveal reveal-delay-1" data-problem>
+              <div class="problem-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                  <path d="M8 7h8M8 12h8M8 17h5" />
+                  <rect x="4" y="4" width="16" height="16" rx="2" />
+                </svg>
+              </div>
+              <p class="num">04</p>
+              <h3></h3>
+              <p class="problem-body"></p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- SERVICES -->
+      <section class="services" id="services">
+        <div class="container">
+          <div class="section-head reveal">
+            <span class="section-badge" data-i18n="services.label">Service Offerings</span>
+            <h2 data-i18n="services.title">Three core packages. Clear outcomes.</h2>
+            <p data-i18n="services.lead">
+              Pricing is scoped per project — based on complexity, timeline, and integration depth.
+            </p>
+          </div>
+          <div class="services-grid">
+            <article class="service-card reveal" data-service>
+              <p class="tag"></p>
+              <h3></h3>
+              <p class="for"></p>
+              <p class="problem-text"></p>
+              <ul></ul>
+              <div class="value-badge"><span data-i18n="services.valueLabel">Value Delivered</span><p class="benefit"></p></div>
+            </article>
+            <article class="service-card reveal featured reveal-delay-1" data-service>
+              <p class="tag"></p>
+              <h3></h3>
+              <p class="for"></p>
+              <p class="problem-text"></p>
+              <ul></ul>
+              <div class="value-badge"><span data-i18n="services.valueLabel">Value Delivered</span><p class="benefit"></p></div>
+            </article>
+            <article class="service-card reveal reveal-delay-2" data-service>
+              <p class="tag"></p>
+              <h3></h3>
+              <p class="for"></p>
+              <p class="problem-text"></p>
+              <ul></ul>
+              <div class="value-badge"><span data-i18n="services.valueLabel">Value Delivered</span><p class="benefit"></p></div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- PORTFOLIO -->
+      <section class="portfolio" id="work">
+        <div id="projects" class="container">
+          <div class="section-head reveal">
+            <span class="section-badge" data-i18n="portfolio.label">Featured Case Studies</span>
+            <h2 data-i18n="portfolio.title">Proof in production-minded builds</h2>
+            <p data-i18n="portfolio.lead">Click architecture nodes to inspect decisions. Inspect OpenAPI without leaving the page.</p>
+          </div>
+          <div class="portfolio-list">
+            <!-- Irada -->
+            <article class="case-card reveal" data-case data-project="irada">
+              <div class="case-media">
+                <div class="arch-frame">
+                  <div class="arch-chrome">
+                    <span class="arch-title" dir="ltr"><bdi dir="ltr">system · irada-academy</bdi></span>
+                    <span class="arch-chip" data-i18n="portfolio.archHint">Click a node</span>
+                  </div>
+                  <div class="arch-canvas ratio-16x9" data-arch-diagram>
+                    <svg viewBox="0 0 640 360" class="arch-svg" role="img" aria-label="Irada architecture">
+                      <rect width="640" height="360" fill="#0c1220" />
+                      <path class="arch-edge" data-edge="clients gateway laravel" d="M130 80 H200" stroke="#334155" stroke-width="2" />
+                      <path class="arch-edge" data-edge="gateway laravel redis postgres" d="M330 80 H390" stroke="#334155" stroke-width="2" />
+                      <path class="arch-edge" data-edge="laravel redis" d="M460 110 V160" stroke="#334155" stroke-width="2" />
+                      <path class="arch-edge" data-edge="laravel postgres" d="M520 110 V160" stroke="#334155" stroke-width="2" />
+                      <g class="arch-node" data-node="clients">
+                        <rect x="40" y="50" width="90" height="60" rx="10" fill="#111726" stroke="rgba(255,255,255,.15)" />
+                        <text x="85" y="85" text-anchor="middle" fill="#e2e8f0" font-size="12" font-family="system-ui">Clients</text>
+                      </g>
+                      <g class="arch-node" data-node="gateway">
+                        <rect x="200" y="50" width="130" height="60" rx="10" fill="#111726" stroke="rgba(6,182,212,.4)" />
+                        <text x="265" y="85" text-anchor="middle" fill="#e2e8f0" font-size="12" font-family="system-ui">API Gateway</text>
+                      </g>
+                      <g class="arch-node" data-node="laravel">
+                        <rect x="390" y="40" width="160" height="70" rx="10" fill="rgba(16,185,129,.12)" stroke="#10b981" />
+                        <text x="470" y="70" text-anchor="middle" fill="#e2e8f0" font-size="13" font-family="system-ui" font-weight="600">Laravel API</text>
+                        <text x="470" y="90" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="system-ui">RBAC · Sanctum</text>
+                      </g>
+                      <g class="arch-node" data-node="redis">
+                        <rect x="390" y="160" width="120" height="54" rx="10" fill="#111726" stroke="rgba(220,56,45,.45)" />
+                        <text x="450" y="192" text-anchor="middle" fill="#e2e8f0" font-size="12" font-family="system-ui">Redis</text>
+                      </g>
+                      <g class="arch-node" data-node="postgres">
+                        <rect x="530" y="160" width="80" height="54" rx="10" fill="#111726" stroke="rgba(65,105,225,.5)" />
+                        <text x="570" y="192" text-anchor="middle" fill="#e2e8f0" font-size="11" font-family="system-ui">PG</text>
+                      </g>
+                      <text x="320" y="280" text-anchor="middle" fill="#64748b" font-size="11" font-family="system-ui">Hover / click nodes for architectural decisions</text>
+                    </svg>
+                    <div class="arch-popover" hidden>
+                      <strong class="arch-pop-title"></strong>
+                      <div class="arch-pop-badges"></div>
+                      <p class="arch-pop-why"></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="case-body">
+                <div class="case-tags"></div>
+                <h3></h3>
+                <div class="casr-grid">
+                  <article class="casr-card" data-casr="challenge"><span class="casr-label"></span><p></p></article>
+                  <article class="casr-card" data-casr="role"><span class="casr-label"></span><p></p></article>
+                  <article class="casr-card" data-casr="solution"><span class="casr-label"></span><p></p></article>
+                  <article class="casr-card" data-casr="outcome"><span class="casr-label"></span><p></p></article>
+                </div>
+                <div class="case-actions">
+                  <a class="case-link" href="#" target="_blank" rel="noopener noreferrer"></a>
+                  <button type="button" class="btn btn-glass btn-sm" data-openapi="irada" data-i18n="portfolio.openapi">
+                    Interactive API Spec
+                  </button>
+                </div>
+              </div>
+            </article>
+
+            <!-- Mostaql -->
+            <article class="case-card reverse reveal" data-case data-project="mostaql">
+              <div class="case-media">
+                <div class="arch-frame">
+                  <div class="arch-chrome">
+                    <span class="arch-title" dir="ltr"><bdi dir="ltr">pipeline · mostaql-bot</bdi></span>
+                    <span class="arch-chip" data-i18n="portfolio.archHint">Click a node</span>
+                  </div>
+                  <div class="arch-canvas ratio-16x9" data-arch-diagram>
+                    <svg viewBox="0 0 640 360" class="arch-svg" role="img">
+                      <rect width="640" height="360" fill="#0c1220" />
+                      <path class="arch-edge" data-edge="scraper laravel" d="M160 170 H230" stroke="#334155" stroke-width="2" />
+                      <path class="arch-edge" data-edge="laravel redis telegram" d="M370 170 H450" stroke="#334155" stroke-width="2" />
+                      <path class="arch-edge" data-edge="laravel redis" d="M300 210 V250" stroke="#334155" stroke-width="2" />
+                      <g class="arch-node" data-node="scraper">
+                        <rect x="40" y="140" width="120" height="60" rx="10" fill="#111726" stroke="rgba(6,182,212,.45)" />
+                        <text x="100" y="175" text-anchor="middle" fill="#e2e8f0" font-size="12" font-family="system-ui">Scraper</text>
+                      </g>
+                      <g class="arch-node" data-node="laravel">
+                        <rect x="230" y="130" width="140" height="80" rx="10" fill="rgba(16,185,129,.12)" stroke="#10b981" />
+                        <text x="300" y="165" text-anchor="middle" fill="#e2e8f0" font-size="12" font-family="system-ui" font-weight="600">Rules Engine</text>
+                        <text x="300" y="185" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="system-ui">filter · rank</text>
+                      </g>
+                      <g class="arch-node" data-node="redis">
+                        <rect x="250" y="250" width="100" height="48" rx="10" fill="#111726" stroke="rgba(220,56,45,.45)" />
+                        <text x="300" y="280" text-anchor="middle" fill="#e2e8f0" font-size="12" font-family="system-ui">Redis</text>
+                      </g>
+                      <g class="arch-node" data-node="telegram">
+                        <rect x="450" y="140" width="120" height="60" rx="10" fill="rgba(16,185,129,.12)" stroke="#10b981" />
+                        <text x="510" y="175" text-anchor="middle" fill="#34d399" font-size="12" font-family="system-ui">Telegram</text>
+                      </g>
+                      <text x="320" y="80" text-anchor="middle" fill="#10b981" font-size="18" font-family="system-ui" font-weight="700" direction="ltr" unicode-bidi="isolate">&lt; 5s alerts</text>
+                    </svg>
+                    <div class="arch-popover" hidden>
+                      <strong class="arch-pop-title"></strong>
+                      <div class="arch-pop-badges"></div>
+                      <p class="arch-pop-why"></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="case-body">
+                <div class="case-tags"></div>
+                <h3></h3>
+                <div class="casr-grid">
+                  <article class="casr-card" data-casr="challenge"><span class="casr-label"></span><p></p></article>
+                  <article class="casr-card" data-casr="role"><span class="casr-label"></span><p></p></article>
+                  <article class="casr-card" data-casr="solution"><span class="casr-label"></span><p></p></article>
+                  <article class="casr-card" data-casr="outcome"><span class="casr-label"></span><p></p></article>
+                </div>
+                <div class="case-actions">
+                  <a class="case-link" href="#" target="_blank" rel="noopener noreferrer"></a>
+                  <button type="button" class="btn btn-glass btn-sm" data-openapi="mostaql" data-i18n="portfolio.openapi">
+                    Interactive API Spec
+                  </button>
+                </div>
+              </div>
+            </article>
+
+            <!-- CV App -->
+            <article class="case-card reveal" data-case data-project="cv">
+              <div class="case-media">
+                <div class="arch-frame">
+                  <div class="arch-chrome">
+                    <span class="arch-title" dir="ltr"><bdi dir="ltr">containers · cv-app</bdi></span>
+                    <span class="arch-chip" data-i18n="portfolio.archHint">Click a node</span>
+                  </div>
+                  <div class="arch-canvas ratio-16x9" data-arch-diagram>
+                    <svg viewBox="0 0 640 360" class="arch-svg" role="img">
+                      <rect width="640" height="360" fill="#0c1220" />
+                      <rect x="36" y="36" width="568" height="288" rx="14" fill="none" stroke="rgba(255,255,255,.08)" stroke-dasharray="5 4" />
+                      <path class="arch-edge" data-edge="clients gateway laravel" d="M140 100 H200" stroke="#334155" stroke-width="2" />
+                      <path class="arch-edge" data-edge="gateway laravel redis postgres stripe openai" d="M340 100 H400" stroke="#334155" stroke-width="2" />
+                      <path class="arch-edge" data-edge="laravel redis postgres" d="M480 140 V190" stroke="#334155" stroke-width="2" />
+                      <path class="arch-edge" data-edge="laravel stripe openai" d="M480 250 H540" stroke="#334155" stroke-width="2" />
+                      <g class="arch-node" data-node="clients">
+                        <rect x="56" y="70" width="84" height="60" rx="10" fill="#111726" stroke="rgba(255,255,255,.15)" />
+                        <text x="98" y="105" text-anchor="middle" fill="#e2e8f0" font-size="12" font-family="system-ui">Vue 3</text>
+                      </g>
+                      <g class="arch-node" data-node="gateway">
+                        <rect x="200" y="70" width="140" height="60" rx="10" fill="#111726" stroke="rgba(6,182,212,.4)" />
+                        <text x="270" y="105" text-anchor="middle" fill="#e2e8f0" font-size="12" font-family="system-ui">Gateway</text>
+                      </g>
+                      <g class="arch-node" data-node="laravel">
+                        <rect x="400" y="60" width="160" height="80" rx="10" fill="rgba(16,185,129,.12)" stroke="#10b981" />
+                        <text x="480" y="95" text-anchor="middle" fill="#e2e8f0" font-size="13" font-family="system-ui" font-weight="600">Laravel 12</text>
+                        <text x="480" y="115" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="system-ui">Clean Arch</text>
+                      </g>
+                      <g class="arch-node" data-node="redis">
+                        <rect x="400" y="190" width="90" height="48" rx="10" fill="#111726" stroke="rgba(220,56,45,.45)" />
+                        <text x="445" y="220" text-anchor="middle" fill="#e2e8f0" font-size="12" font-family="system-ui">Redis</text>
+                      </g>
+                      <g class="arch-node" data-node="postgres">
+                        <rect x="510" y="190" width="90" height="48" rx="10" fill="#111726" stroke="rgba(65,105,225,.5)" />
+                        <text x="555" y="220" text-anchor="middle" fill="#e2e8f0" font-size="11" font-family="system-ui">Postgres</text>
+                      </g>
+                      <g class="arch-node" data-node="stripe">
+                        <rect x="540" y="270" width="70" height="40" rx="8" fill="#111726" stroke="rgba(99,91,255,.5)" />
+                        <text x="575" y="295" text-anchor="middle" fill="#e2e8f0" font-size="11" font-family="system-ui">Stripe</text>
+                      </g>
+                      <g class="arch-node" data-node="openai">
+                        <rect x="450" y="270" width="70" height="40" rx="8" fill="#111726" stroke="rgba(16,163,127,.5)" />
+                        <text x="485" y="295" text-anchor="middle" fill="#e2e8f0" font-size="11" font-family="system-ui">OpenAI</text>
+                      </g>
+                    </svg>
+                    <div class="arch-popover" hidden>
+                      <strong class="arch-pop-title"></strong>
+                      <div class="arch-pop-badges"></div>
+                      <p class="arch-pop-why"></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="case-body">
+                <div class="case-tags"></div>
+                <h3></h3>
+                <div class="casr-grid">
+                  <article class="casr-card" data-casr="challenge"><span class="casr-label"></span><p></p></article>
+                  <article class="casr-card" data-casr="role"><span class="casr-label"></span><p></p></article>
+                  <article class="casr-card" data-casr="solution"><span class="casr-label"></span><p></p></article>
+                  <article class="casr-card" data-casr="outcome"><span class="casr-label"></span><p></p></article>
+                </div>
+                <div class="case-actions">
+                  <a class="case-link" href="#" target="_blank" rel="noopener noreferrer"></a>
+                  <button type="button" class="btn btn-glass btn-sm" data-openapi="cv" data-i18n="portfolio.openapi">
+                    Interactive API Spec
+                  </button>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- ENGINEERING RIGOR -->
+      <section class="rigor" id="rigor">
+        <div class="container">
+          <div class="section-head reveal">
+            <span class="section-badge" data-i18n="rigor.label">Engineering Rigor &amp; Performance</span>
+            <h2 data-i18n="rigor.title">N+1 eliminated. Latency collapsed.</h2>
+            <p data-i18n="rigor.lead">
+              Side-by-side proof of query discipline — eager loading, indexes, and measurable resource savings.
+            </p>
+          </div>
+          <div class="rigor-grid reveal">
+            <article class="rigor-card rigor-bad">
+              <header>
+                <span class="rigor-tag bad" data-i18n="rigor.badTag">Unoptimized Query</span>
+                <div class="rigor-stats" dir="ltr">
+                  <span><bdi dir="ltr">102</bdi> <small data-i18n="rigor.queries">DB Queries</small></span>
+                  <span><bdi dir="ltr">380ms</bdi></span>
+                  <span><bdi dir="ltr">18MB</bdi> <small>RAM</small></span>
+                </div>
+              </header>
+              <pre class="rigor-code overflow-x-auto" dir="ltr"><code><span class="c-muted">// N+1 — loads relations in a loop</span>
+<span class="c-key">$orders</span> = Order::<span class="c-fn">all</span>();
+<span class="c-key">foreach</span> (<span class="c-key">$orders</span> <span class="c-key">as</span> <span class="c-key">$order</span>) {
+  echo <span class="c-key">$order</span>-&gt;user-&gt;email; <span class="c-muted">// +1 query each</span>
+  echo <span class="c-key">$order</span>-&gt;items-&gt;<span class="c-fn">count</span>();
+}</code></pre>
+              <div class="rigor-meters">
+                <label data-i18n="rigor.queryBar">Query count</label>
+                <div class="meter"><span data-bar="100%" class="meter-fill bad"></span></div>
+                <label data-i18n="rigor.memBar">Memory</label>
+                <div class="meter"><span data-bar="90%" class="meter-fill bad"></span></div>
+              </div>
+            </article>
+            <article class="rigor-card rigor-good">
+              <header>
+                <span class="rigor-tag good" data-i18n="rigor.goodTag">Optimized Query</span>
+                <div class="rigor-stats" dir="ltr">
+                  <span><bdi dir="ltr">2</bdi> <small data-i18n="rigor.queries">DB Queries</small></span>
+                  <span><bdi dir="ltr">12ms</bdi></span>
+                  <span><bdi dir="ltr">2MB</bdi> <small>RAM</small></span>
+                </div>
+              </header>
+              <pre class="rigor-code overflow-x-auto" dir="ltr"><code><span class="c-muted">// Eager load + selective columns + index</span>
+<span class="c-key">$orders</span> = Order::<span class="c-fn">query</span>()
+  -&gt;<span class="c-fn">with</span>([<span class="c-str">'user:id,email'</span>, <span class="c-str">'items'</span>])
+  -&gt;<span class="c-fn">select</span>([<span class="c-str">'id'</span>, <span class="c-str">'user_id'</span>, <span class="c-str">'total'</span>])
+  -&gt;<span class="c-fn">get</span>();</code></pre>
+              <div class="rigor-meters">
+                <label data-i18n="rigor.queryBar">Query count</label>
+                <div class="meter"><span data-bar="8%" class="meter-fill good"></span></div>
+                <label data-i18n="rigor.memBar">Memory</label>
+                <div class="meter"><span data-bar="12%" class="meter-fill good"></span></div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- WHY -->
+      <section class="why" id="why">
+        <div class="container">
+          <div class="section-head reveal">
+            <span class="section-badge" data-i18n="why.label">Why Work With Me</span>
+            <h2 data-i18n="why.title">What you actually get — not just “backend code.”</h2>
+            <p data-i18n="why.lead">
+              Founders choose me when they need Clean Architecture, integration depth, and docs that unblock the rest of
+              the team.
+            </p>
+          </div>
+          <div class="bento-grid">
+            <article class="bento-card bento-lg reveal" data-why>
+              <div class="bento-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                  <path d="M4 7h16M4 12h10M4 17h14" />
+                </svg>
+              </div>
+              <h3></h3>
+              <p></p>
+            </article>
+            <article class="bento-card reveal reveal-delay-1" data-why>
+              <div class="bento-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                  <path d="M8 8h8v8H8z" /><path d="M6 4h12v2H6zM6 18h12v2H6z" />
+                </svg>
+              </div>
+              <h3></h3>
+              <p></p>
+            </article>
+            <article class="bento-card reveal" data-why>
+              <div class="bento-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                  <circle cx="12" cy="12" r="8" /><path d="M12 8v4l3 2" />
+                </svg>
+              </div>
+              <h3></h3>
+              <p></p>
+            </article>
+            <article class="bento-card bento-wide reveal reveal-delay-1" data-why>
+              <div class="bento-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                  <rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 9h18" />
+                </svg>
+              </div>
+              <h3></h3>
+              <p></p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- ABOUT -->
+      <section class="about" id="about">
+        <div class="container about-grid">
+          <div class="about-photo reveal">
+            <div class="portrait-frame">
+              <img
+                src="./assets/images/yousef-zaqout.png"
+                alt="Yousef Zaqout"
+                width="640"
+                height="640"
+                loading="lazy"
+              />
+            </div>
+          </div>
+          <div class="about-copy reveal">
+            <span class="section-badge" data-i18n="about.label">About</span>
+            <h2 data-i18n="about.title">Backend-first. Product-minded.</h2>
+            <p data-about-p></p>
+            <p data-about-p></p>
+            <p data-about-p></p>
+            <div class="stack" aria-label="Tech stack">
+              <span>PHP</span><span>Laravel</span><span>PostgreSQL</span><span>Redis</span><span>Docker</span>
+              <span>OpenAI</span><span>Vue.js</span><span>Swagger</span><span>Postman</span><span>GitHub</span>
+            </div>
+            <a
+              class="btn btn-glass"
+              href="https://www.linkedin.com/in/yousefzaqout"
+              target="_blank"
+              rel="noopener noreferrer"
+              data-i18n="about.cta"
+              >Connect on LinkedIn</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- TESTIMONIALS -->
+      <section class="testimonials" id="testimonials">
+        <div class="container">
+          <div class="section-head reveal">
+            <span class="section-badge" data-i18n="testimonials.label">Testimonials</span>
+            <h2 data-i18n="testimonials.title">What collaborators say</h2>
+            <p data-i18n="testimonials.lead">
+              From Full Stack &amp; Scrum Master work at Areisto through the “Khareej Qader” program.
+            </p>
+          </div>
+          <div class="testimonial-grid">
+            <article class="testimonial-card reveal" data-testimonial>
+              <div class="quote-mark" aria-hidden="true">“</div>
+              <blockquote></blockquote>
+              <div class="testimonial-footer">
+                <div class="avatar-wrap avatar-logo">
+                  <img src="./assets/images/areisto_logo.jpeg" alt="Areisto" width="44" height="44" loading="lazy" />
+                </div>
+                <div>
+                  <cite></cite>
+                  <p class="role"></p>
+                </div>
+                <span class="verified" title="Verified" aria-label="Verified">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                    <path
+                      d="M12 2l2.4 2.1 3.2-.4 1.2 3 2.9 1.4-1.2 3 .9 3.1-3.1.9-1.4 2.9-3-.9-3 1.2-1.4-2.9-3.1-.9.9-3.1-1.2-3 2.9-1.4 1.2-3 3.2.4L12 2zm-1.1 13.2l5.6-5.6-1.4-1.4-4.2 4.2-2-2-1.4 1.4 3.4 3.4z"
+                    />
+                  </svg>
+                </span>
+              </div>
+            </article>
+            <article class="testimonial-card reveal reveal-delay-1" data-testimonial>
+              <div class="quote-mark" aria-hidden="true">“</div>
+              <blockquote></blockquote>
+              <div class="testimonial-footer">
+                <div class="avatar-wrap avatar-logo">
+                  <img src="./assets/images/areisto_logo.jpeg" alt="Areisto" width="44" height="44" loading="lazy" />
+                </div>
+                <div>
+                  <cite></cite>
+                  <p class="role"></p>
+                </div>
+                <span class="verified" title="Verified" aria-label="Verified">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                    <path
+                      d="M12 2l2.4 2.1 3.2-.4 1.2 3 2.9 1.4-1.2 3 .9 3.1-3.1.9-1.4 2.9-3-.9-3 1.2-1.4-2.9-3.1-.9.9-3.1-1.2-3 2.9-1.4 1.2-3 3.2.4L12 2zm-1.1 13.2l5.6-5.6-1.4-1.4-4.2 4.2-2-2-1.4 1.4 3.4 3.4z"
+                    />
+                  </svg>
+                </span>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- CREDENTIALS -->
+      <section class="credentials" id="credentials">
+        <div class="container">
+          <div class="section-head reveal">
+            <span class="section-badge" data-i18n="credentials.label">Credentials</span>
+            <h2 data-i18n="credentials.title">Education, programs &amp; verified badges</h2>
+          </div>
+          <div class="cred-grid">
+            <article class="cred-card reveal" data-cred>
+              <div class="cred-mark"></div>
+              <div><h3></h3><p></p></div>
+            </article>
+            <article class="cred-card reveal reveal-delay-1" data-cred>
+              <div class="cred-mark"></div>
+              <div><h3></h3><p></p></div>
+            </article>
+            <article class="cred-card reveal reveal-delay-2" data-cred>
+              <div class="cred-mark"></div>
+              <div><h3></h3><p></p></div>
+            </article>
+            <article class="cred-card reveal reveal-delay-3" data-cred>
+              <div class="cred-mark"></div>
+              <div><h3></h3><p></p></div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONTACT / FINAL CTA -->
+      <section class="contact" id="contact">
+        <div class="container">
+          <div class="contact-panel reveal">
+            <span class="section-badge" data-i18n="contact.label">Next Step</span>
+            <h2 data-i18n="contact.title">Ready to unstick your backend?</h2>
+            <p data-i18n="contact.lead">
+              Book a call to map your API, integrations, and delivery plan. Pricing depends on project scope — we’ll
+              define it together after understanding your needs.
+            </p>
+            <p class="contact-note" data-i18n="contact.note">
+              Typical fit: startups and product teams across KSA, the Gulf, and remote US/EU clients.
+            </p>
+            <div class="contact-ctas">
+              <a
+                class="btn btn-primary btn-glow"
+                href="https://wa.me/972594803033"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-i18n="contact.ctaPrimary"
+                data-track="cta_whatsapp"
+                data-track-location="contact"
+                >WhatsApp</a
+              >
+              <a
+                class="btn btn-glass"
+                href="mailto:zaqoutyousef@gmail.com"
+                data-i18n="contact.ctaSecondary"
+                data-track="cta_email"
+                data-track-location="contact"
+                >Email</a
+              >
+            </div>
+            <div class="contact-social">
+              <a href="https://github.com/yousefbzaqout" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+                  <path
+                    d="M12 2C6.48 2 2 6.58 2 12.26c0 4.52 2.87 8.35 6.84 9.7.5.1.68-.22.68-.48v-1.7c-2.78.62-3.37-1.37-3.37-1.37-.46-1.2-1.12-1.52-1.12-1.52-.92-.64.07-.63.07-.63 1.02.07 1.56 1.07 1.56 1.07.9 1.58 2.36 1.12 2.94.86.09-.67.35-1.12.64-1.38-2.22-.26-4.55-1.14-4.55-5.07 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.7 0 0 .84-.27 2.75 1.05A9.3 9.3 0 0 1 12 6.8c.85 0 1.7.12 2.5.34 1.9-1.32 2.74-1.05 2.74-1.05.55 1.4.2 2.44.1 2.7.64.72 1.03 1.63 1.03 2.75 0 3.94-2.34 4.8-4.57 5.06.36.32.68.94.68 1.9v2.82c0 .26.18.59.69.48A10.27 10.27 0 0 0 22 12.26C22 6.58 17.52 2 12 2z"
+                  />
+                </svg>
+              </a>
+              <a
+                href="https://www.linkedin.com/in/yousefzaqout"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="LinkedIn"
+              >
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+                  <path
+                    d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45zM22.23 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.23 0z"
+                  />
+                </svg>
+              </a>
+              <a href="mailto:zaqoutyousef@gmail.com" aria-label="Email">zaqoutyousef@gmail.com</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <p>
+          <strong data-i18n="brand">Yousef Zaqout</strong>
+          <span class="footer-sep">·</span>
+          <span data-i18n="footer.rights">© 2026 · Backend Engineering Portfolio</span>
+        </p>
+        <div class="footer-links">
+          <a href="https://github.com/yousefbzaqout" target="_blank" rel="noopener noreferrer" data-i18n="footer.github"
+            >GitHub</a
+          >
+          <a
+            href="https://www.linkedin.com/in/yousefzaqout"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-i18n="footer.linkedin"
+            >LinkedIn</a
+          >
+          <a href="mailto:zaqoutyousef@gmail.com" data-i18n="footer.email">Email</a>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Command palette -->
+    <div class="overlay-backdrop" id="cmd-backdrop"></div>
+    <div class="cmd-palette" id="cmd-palette" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Command palette">
+      <div class="cmd-shell" dir="ltr">
+        <div class="cmd-prompt-row">
+          <span class="cmd-prompt-sign">›</span>
+          <input id="cmd-input" type="text" autocomplete="off" spellcheck="false" placeholder="Type a command — try help" />
+          <button type="button" class="cmd-close" id="cmd-close" aria-label="Close command palette" title="Close">
+            ✕
+          </button>
+          <kbd class="cmd-esc-hint">esc</kbd>
+        </div>
+        <div class="cmd-results" id="cmd-results"></div>
+        <p class="cmd-hint" data-i18n="cmd.hint">help · skills · projects · curl /contact · download-cv</p>
+      </div>
+    </div>
+
+    <!-- OpenAPI drawer -->
+    <div class="overlay-backdrop" id="drawer-backdrop"></div>
+    <aside class="openapi-drawer" id="openapi-drawer" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="openapi-title">
+      <header class="drawer-head">
+        <div>
+          <h3 id="openapi-title">API Spec</h3>
+          <p id="openapi-meta" class="drawer-meta" dir="ltr"></p>
+        </div>
+        <button type="button" class="icon-btn" id="drawer-close" aria-label="Close" data-i18n-aria="common.close">✕</button>
+      </header>
+      <div class="drawer-body" id="openapi-paths" dir="ltr"></div>
+    </aside>
+
+    <!-- Contact modal -->
+    <div class="overlay-backdrop" id="modal-backdrop"></div>
+    <div class="contact-modal" id="contact-modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="contact-modal-title">
+      <button type="button" class="icon-btn modal-x" id="modal-close" aria-label="Close">✕</button>
+      <h3 id="contact-modal-title" data-i18n="contact.modalTitle">Open a channel</h3>
+      <p data-i18n="contact.modalLead">Pick the fastest path — WhatsApp for discovery, email for briefs.</p>
+      <div class="contact-ctas">
+        <a
+          class="btn btn-primary"
+          href="https://wa.me/972594803033"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-track="cta_whatsapp"
+          data-track-location="modal"
+          >WhatsApp</a
+        >
+        <a
+          class="btn btn-glass"
+          href="mailto:zaqoutyousef@gmail.com"
+          data-track="cta_email"
+          data-track-location="modal"
+          >Email</a
+        >
+      </div>
+    </div>
+
+    <script type="module" src="./js/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,825 @@
+/* Interactive portfolio features — sandbox, cmd+k, arch, openapi, telemetry */
+window.YZFeatures = (function () {
+  const $ = (sel, el = document) => el.querySelector(sel);
+  const $$ = (sel, el = document) => [...el.querySelectorAll(sel)];
+
+  const ENDPOINTS = {
+    metrics: {
+      method: "GET",
+      path: "/v1/metrics",
+      label: "System Telemetry",
+      body: null,
+      cold: 138,
+      cached: 12,
+      build: (cached, latency, body) => ({
+        ok: true,
+        endpoint: "/v1/metrics",
+        cached,
+        cache_layer: cached ? "redis" : "postgresql",
+        latency_ms: latency,
+        data: {
+          api_p95_ms: cached ? 12 : 142,
+          requests_24h: 12840,
+          cache_hit_rate: cached ? 0.97 : 0.0,
+          stack: ["Laravel", "PostgreSQL", "Redis"],
+        },
+      }),
+    },
+    rag: {
+      method: "POST",
+      path: "/v1/ai/rag-search",
+      label: "AI / RAG Pipeline",
+      body: { query: "How do we rate-limit checkout?", top_k: 5, collection: "docs" },
+      cold: 420,
+      cached: 48,
+      build: (cached, latency, body) => ({
+        ok: true,
+        endpoint: "/v1/ai/rag-search",
+        cached,
+        latency_ms: latency,
+        query: body?.query || "",
+        results: [
+          { id: "doc_18", score: 0.91, snippet: "Redis token bucket for Stripe webhooks…" },
+          { id: "doc_07", score: 0.86, snippet: "Eager-load orders to avoid N+1…" },
+        ],
+        embeddings: cached ? "redis-vector-cache" : "openai-embedding-3-small",
+      }),
+    },
+    stripe: {
+      method: "POST",
+      path: "/v1/checkout/stripe",
+      label: "Payment Gateway",
+      body: { amount: 4900, currency: "usd", product: "api_retainer" },
+      cold: 210,
+      cached: 64,
+      build: (cached, latency, body) => ({
+        ok: true,
+        endpoint: "/v1/checkout/stripe",
+        cached,
+        latency_ms: latency,
+        checkout: {
+          id: "cs_test_a1b2",
+          amount: body?.amount ?? 4900,
+          currency: body?.currency ?? "usd",
+          status: "requires_payment_method",
+          idempotency_reused: cached,
+        },
+      }),
+    },
+  };
+
+  const NODE_INFO = {
+    clients: {
+      title: "Clients",
+      badges: ["Web", "Mobile", "SPA"],
+      why: "Entry point for product surfaces. All traffic is versioned through the public API contract.",
+    },
+    gateway: {
+      title: "API Gateway",
+      badges: ["Sanctum", "Throttle", "TLS"],
+      why: "Central auth, rate limiting, and request shaping before work hits application services.",
+    },
+    laravel: {
+      title: "Laravel Backend",
+      badges: ["Clean Arch", "SOLID", "Queues"],
+      why: "Domain services and use-cases live here — controllers stay thin, business rules stay testable.",
+    },
+    redis: {
+      title: "Redis Cache",
+      badges: ["Cache", "Sessions", "Rate limit"],
+      why: "Chosen for sub-20ms reads on hot paths: sessions, rate limits, and expensive query memoization.",
+    },
+    postgres: {
+      title: "PostgreSQL",
+      badges: ["Indexed", "ACID", "JSONB"],
+      why: "Source of truth with composite indexes and constrained schemas for predictable p95 latency.",
+    },
+    stripe: {
+      title: "Stripe",
+      badges: ["Webhooks", "Idempotency"],
+      why: "Payment intents + signed webhooks with idempotency keys to prevent double-charges.",
+    },
+    openai: {
+      title: "OpenAI / RAG",
+      badges: ["Embeddings", "Retrieval"],
+      why: "RAG pipeline retrieves grounded chunks before generation — reduces hallucination risk in product flows.",
+    },
+    scraper: {
+      title: "Scraper Bot",
+      badges: ["Polling", "Filters"],
+      why: "Lightweight fetch + filter pipeline optimized for sub-second discovery of new listings.",
+    },
+    telegram: {
+      title: "Telegram",
+      badges: ["Alerts", "< 5s"],
+      why: "Push channel for high-signal opportunities without polling the UI.",
+    },
+  };
+
+  const OPENAPI = {
+    irada: {
+      title: "Irada Academy API",
+      version: "1.2.0",
+      baseUrl: "https://api.irada.demo/v1",
+      auth: "Bearer Sanctum token",
+      paths: [
+        {
+          method: "GET",
+          path: "/courses",
+          summary: "List courses with enrollment counts",
+          headers: { Authorization: "Bearer {token}", Accept: "application/json" },
+          response: { data: [{ id: 1, title: "Laravel APIs", seats: 40 }], meta: { total: 12 } },
+        },
+        {
+          method: "POST",
+          path: "/enrollments",
+          summary: "Enroll authenticated user in a course",
+          body: { course_id: 12 },
+          response: { id: 88, status: "active", role: "student" },
+        },
+      ],
+    },
+    mostaql: {
+      title: "Mostaql Bot API",
+      version: "0.9.0",
+      baseUrl: "https://bot.demo/v1",
+      auth: "X-Bot-Token",
+      paths: [
+        {
+          method: "GET",
+          path: "/jobs/latest",
+          summary: "Fetch filtered freelance listings",
+          response: { items: [{ id: "m-102", title: "Laravel API", match: 0.94 }], latency_ms: 420 },
+        },
+        {
+          method: "POST",
+          path: "/alerts/telegram",
+          summary: "Dispatch Telegram notification",
+          body: { chat_id: 123, job_id: "m-102" },
+          response: { delivered: true, eta_ms: 1800 },
+        },
+      ],
+    },
+    cv: {
+      title: "CV Builder API",
+      version: "1.0.0",
+      baseUrl: "https://cv.demo/v1",
+      auth: "Bearer Sanctum token",
+      paths: [
+        {
+          method: "GET",
+          path: "/resumes/{id}",
+          summary: "Fetch resume aggregate with sections",
+          response: { id: 9, sections: ["experience", "skills"], cached: true },
+        },
+        {
+          method: "POST",
+          path: "/resumes",
+          summary: "Create resume (Clean Architecture use-case)",
+          body: { title: "Backend Engineer", template: "modern" },
+          response: { id: 10, status: "draft" },
+        },
+      ],
+    },
+  };
+
+  let state = {
+    endpoint: "metrics",
+    cached: false,
+    audio: localStorage.getItem("yz-audio") !== "0",
+    lastLatency: 0,
+  };
+
+  function t() {
+    return window.I18N?.[document.documentElement.lang === "ar" ? "ar" : "en"] || {};
+  }
+
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function syntaxJson(obj) {
+    return JSON.stringify(obj, null, 2)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/("(?:\\.|[^"\\])*")(\s*:)/g, '<span class="c-key">$1</span>$2')
+      .replace(/(:\s*)("(?:\\.|[^"\\])*")/g, '$1<span class="c-str">$2</span>')
+      .replace(/(:\s*)(\d+\.?\d*)/g, '$1<span class="c-num">$2</span>')
+      .replace(/(:\s*)(true|false|null)/g, '$1<span class="c-fn">$2</span>')
+      .replace(/(^\s*)("(?:\\.|[^"\\])*")(,?$)/gm, '$1<span class="c-str">$2</span>$3');
+  }
+
+  function playClick() {
+    if (!state.audio) return;
+    try {
+      const ctx = playClick.ctx || (playClick.ctx = new (window.AudioContext || window.webkitAudioContext)());
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = "square";
+      o.frequency.value = 180 + Math.random() * 40;
+      g.gain.value = 0.03;
+      o.connect(g);
+      g.connect(ctx.destination);
+      o.start();
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+      o.stop(ctx.currentTime + 0.06);
+    } catch (_) {}
+  }
+
+  function animateCount(el, from, to, ms = 300) {
+    const start = performance.now();
+    const pill = el?.closest?.(".latency-pill");
+    function frame(now) {
+      const p = Math.min(1, (now - start) / ms);
+      const eased = 1 - Math.pow(1 - p, 3);
+      const val = Math.round(from + (to - from) * eased);
+      el.textContent = `${val}ms`;
+      if (el instanceof HTMLElement) el.setAttribute("dir", "ltr");
+      if (p < 1) requestAnimationFrame(frame);
+      else if (pill) {
+        pill.classList.remove("is-flash");
+        // reflow to restart animation
+        void pill.offsetWidth;
+        pill.classList.add("is-flash");
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function readLatencyMs(el) {
+    if (!el) return 0;
+    const n = parseInt(String(el.textContent).replace(/[^\d]/g, ""), 10);
+    return Number.isFinite(n) ? n : 0;
+  }
+
+  function flashLatency() {
+    const pill = $(".latency-pill");
+    if (!pill) return;
+    pill.classList.remove("is-flash");
+    void pill.offsetWidth;
+    pill.classList.add("is-flash");
+  }
+
+  function parseBody() {
+    const ta = $("#sandbox-body-input");
+    if (!ta || ta.disabled) return null;
+    try {
+      return JSON.parse(ta.value || "{}");
+    } catch {
+      return null;
+    }
+  }
+
+  function syncEndpointUI() {
+    const ep = ENDPOINTS[state.endpoint];
+    const badge = $(".sandbox-badge");
+    const curlLine = $("#sandbox-curl-preview");
+    const bodyWrap = $("#sandbox-body-wrap");
+    const bodyInput = $("#sandbox-body-input");
+    if (badge) {
+      badge.setAttribute("dir", "ltr");
+      badge.innerHTML = `<bdi dir="ltr">${ep.method} ${ep.path}</bdi>`;
+    }
+    if (curlLine) {
+      curlLine.setAttribute("dir", "ltr");
+      curlLine.innerHTML = `<bdi dir="ltr">${escapeHtml(buildCurl(false))}</bdi>`;
+    }
+    $$("[data-endpoint]").forEach((btn) => {
+      btn.classList.toggle("is-active", btn.dataset.endpoint === state.endpoint);
+    });
+    const hasBody = ep.method !== "GET";
+    if (bodyWrap) bodyWrap.hidden = !hasBody;
+    if (bodyInput) {
+      bodyInput.disabled = !hasBody;
+      if (hasBody && ep.body) bodyInput.value = JSON.stringify(ep.body, null, 2);
+    }
+  }
+
+  function buildCurl(pretty = true) {
+    const ep = ENDPOINTS[state.endpoint];
+    const url = `https://api.demo${ep.path}`;
+    let cmd = `curl -X ${ep.method} '${url}' -H 'Accept: application/json'`;
+    if (ep.method !== "GET") {
+      const body = parseBody() || ep.body || {};
+      cmd += ` -H 'Content-Type: application/json' -d '${JSON.stringify(body)}'`;
+    }
+    if (state.cached) cmd += ` -H 'X-Cache-Prefer: hit'`;
+    return pretty ? cmd : cmd;
+  }
+
+  function runSandbox(opts = {}) {
+    const { quiet = false } = opts;
+    const ep = ENDPOINTS[state.endpoint];
+    const output = $("#sandbox-output");
+    const meta = $("#sandbox-meta");
+    const msEl = $("#sandbox-ms");
+    const runBtn = $("#run-api");
+    const statusPill = $("#sandbox-status");
+    if (!output || !meta || !msEl || !runBtn) return;
+
+    const body = parseBody();
+    if (ep.method !== "GET" && body === null) {
+      output.innerHTML = `<span class="c-muted">Invalid JSON payload</span>`;
+      return;
+    }
+
+    const base = state.cached ? ep.cached : ep.cold;
+    const latency = base + Math.floor(Math.random() * 8);
+    const from = readLatencyMs(msEl) || state.lastLatency || (state.cached ? ep.cold : ep.cached);
+    const i18n = t();
+
+    if (!quiet) {
+      runBtn.disabled = true;
+      meta.hidden = true;
+      output.innerHTML = `<span class="c-muted">${escapeHtml(i18n.sandbox?.running || "Fetching…")}</span>`;
+      playClick();
+    }
+
+    const delay = quiet ? 40 : Math.min(latency, 280);
+
+    setTimeout(() => {
+      const payload = ep.build(state.cached, latency, body);
+      output.innerHTML = syntaxJson(payload);
+      meta.hidden = false;
+      animateCount(msEl, from, latency, 300);
+      state.lastLatency = latency;
+      if (statusPill) {
+        statusPill.setAttribute("dir", "ltr");
+        statusPill.innerHTML = `<bdi dir="ltr">200 OK</bdi>`;
+      }
+      runBtn.disabled = false;
+      if (!quiet) {
+        window.YZAnalytics?.track("sandbox_run", {
+          endpoint: state.endpoint,
+          method: ep.method,
+          path: ep.path,
+          cache_mode: state.cached ? "hit" : "cold",
+          latency_ms: latency,
+        });
+        playClick();
+      } else flashLatency();
+    }, delay);
+  }
+
+  function initSandbox() {
+    syncEndpointUI();
+    $$("[data-endpoint]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        state.endpoint = btn.dataset.endpoint;
+        syncEndpointUI();
+        playClick();
+      });
+    });
+
+    $$("[data-cache]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const nextCached = btn.dataset.cache === "hit";
+        if (state.cached === nextCached) return;
+        state.cached = nextCached;
+        $$("[data-cache]").forEach((b) => b.classList.toggle("is-active", b === btn));
+        const curlLine = $("#sandbox-curl-preview");
+        if (curlLine) {
+          curlLine.setAttribute("dir", "ltr");
+          curlLine.innerHTML = `<bdi dir="ltr">${escapeHtml(buildCurl(false))}</bdi>`;
+        }
+        window.YZAnalytics?.track("sandbox_cache_toggle", {
+          cache_mode: state.cached ? "hit" : "cold",
+          endpoint: state.endpoint,
+        });
+        playClick();
+        // Always animate latency transition (even before first Run)
+        const meta = $("#sandbox-meta");
+        const msEl = $("#sandbox-ms");
+        if (meta) meta.hidden = false;
+        if (msEl && !state.lastLatency) {
+          const ep = ENDPOINTS[state.endpoint];
+          msEl.textContent = `${state.cached ? ep.cold : ep.cached}ms`;
+          state.lastLatency = state.cached ? ep.cold : ep.cached;
+        }
+        runSandbox({ quiet: true });
+      });
+    });
+
+    $("#run-api")?.addEventListener("click", () => runSandbox());
+    $("#copy-curl")?.addEventListener("click", async () => {
+      const cmd = buildCurl();
+      const btn = $("#copy-curl");
+      try {
+        await navigator.clipboard.writeText(cmd);
+      } catch {
+        const ta = document.createElement("textarea");
+        ta.value = cmd;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        ta.remove();
+      }
+      const label = btn ? $("[data-i18n='sandbox.copyCurl']", btn) : null;
+      const i18n = t();
+      if (label) label.textContent = i18n.sandbox?.copiedCurl || "Copied";
+      btn?.classList.add("is-copied");
+      setTimeout(() => {
+        btn?.classList.remove("is-copied");
+        if (label) label.textContent = t().sandbox?.copyCurl || "Copy as cURL";
+      }, 1400);
+      playClick();
+    });
+  }
+
+  /* —— Architecture diagrams —— */
+  function initArchitecture() {
+    $$("[data-arch-diagram]").forEach((canvas) => {
+      const pop = $(".arch-popover", canvas);
+      const nodes = $$("[data-node]", canvas);
+      const edges = $$("[data-edge]", canvas);
+
+      function clear() {
+        nodes.forEach((n) => n.classList.remove("is-active", "is-dim"));
+        edges.forEach((e) => e.classList.remove("is-lit", "is-dim"));
+        if (pop) pop.hidden = true;
+      }
+
+      function activate(nodeKey) {
+        const info = NODE_INFO[nodeKey];
+        if (!info || !pop) return;
+        nodes.forEach((n) => {
+          const on = n.dataset.node === nodeKey;
+          n.classList.toggle("is-active", on);
+          n.classList.toggle("is-dim", !on);
+        });
+        edges.forEach((e) => {
+          const lit = (e.dataset.edge || "").split(/\s+/).includes(nodeKey);
+          e.classList.toggle("is-lit", lit);
+          e.classList.toggle("is-dim", !lit);
+        });
+        $(".arch-pop-title", pop).textContent = info.title;
+        $(".arch-pop-why", pop).textContent = info.why;
+        const badges = $(".arch-pop-badges", pop);
+        badges.innerHTML = info.badges
+          .map((b) => `<span class="chip"><bdi dir="ltr">${escapeHtml(b)}</bdi></span>`)
+          .join("");
+        pop.hidden = false;
+        playClick();
+      }
+
+      nodes.forEach((n) => {
+        n.style.cursor = "pointer";
+        n.addEventListener("mouseenter", () => activate(n.dataset.node));
+        n.addEventListener("click", (e) => {
+          e.stopPropagation();
+          activate(n.dataset.node);
+        });
+      });
+
+      canvas.addEventListener("mouseleave", clear);
+      document.addEventListener("click", (e) => {
+        if (!canvas.contains(e.target)) clear();
+      });
+    });
+  }
+
+  /* —— OpenAPI drawer —— */
+  function openDrawer(specKey) {
+    const spec = OPENAPI[specKey];
+    if (!spec) return;
+    const drawer = $("#openapi-drawer");
+    const backdrop = $("#drawer-backdrop");
+    if (!drawer || !backdrop) return;
+
+    $("#openapi-title") && ($("#openapi-title").textContent = spec.title);
+    const metaEl = $("#openapi-meta");
+    if (metaEl) {
+      metaEl.innerHTML = `<bdi dir="ltr">${escapeHtml(
+        `${spec.version} · ${spec.baseUrl} · Auth: ${spec.auth}`
+      )}</bdi>`;
+    }
+    const body = $("#openapi-paths");
+    if (!body) return;
+    body.innerHTML = spec.paths
+      .map(
+        (p) => `
+      <article class="oa-path">
+        <header>
+          <span class="oa-method oa-${p.method.toLowerCase()}" dir="ltr"><bdi dir="ltr">${p.method}</bdi></span>
+          <code dir="ltr"><bdi dir="ltr">${escapeHtml(p.path)}</bdi></code>
+        </header>
+        <p>${escapeHtml(p.summary)}</p>
+        ${
+          p.headers
+            ? `<h5>Headers</h5><pre class="overflow-x-auto" dir="ltr">${syntaxJson(p.headers)}</pre>`
+            : ""
+        }
+        ${p.body ? `<h5>Request body</h5><pre class="overflow-x-auto" dir="ltr">${syntaxJson(p.body)}</pre>` : ""}
+        <h5>Example response</h5>
+        <pre class="overflow-x-auto" dir="ltr">${syntaxJson(p.response)}</pre>
+      </article>`
+      )
+      .join("");
+
+    drawer.classList.add("is-open");
+    backdrop.classList.add("is-open");
+    drawer.setAttribute("aria-hidden", "false");
+    document.body.classList.add("drawer-open");
+    window.YZAnalytics?.track("openapi_drawer_open", {
+      spec: specKey,
+      title: spec.title,
+      version: spec.version,
+    });
+    playClick();
+  }
+
+  function closeDrawer() {
+    $("#openapi-drawer")?.classList.remove("is-open");
+    $("#drawer-backdrop")?.classList.remove("is-open");
+    $("#openapi-drawer")?.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("drawer-open");
+  }
+
+  function initOpenApi() {
+    $$("[data-openapi]").forEach((btn) => {
+      btn.addEventListener("click", () => openDrawer(btn.dataset.openapi));
+    });
+    $("#drawer-close")?.addEventListener("click", closeDrawer);
+    $("#drawer-backdrop")?.addEventListener("click", closeDrawer);
+  }
+
+  /* —— Command palette —— */
+  function openPalette() {
+    const pal = $("#cmd-palette");
+    const backdrop = $("#cmd-backdrop");
+    if (!pal) return;
+    pal.classList.add("is-open");
+    backdrop?.classList.add("is-open");
+    pal.setAttribute("aria-hidden", "false");
+    const input = $("#cmd-input");
+    if (input) {
+      input.value = "";
+      input.focus();
+    }
+    renderCmdResults("");
+    playClick();
+  }
+
+  function closePalette() {
+    $("#cmd-palette")?.classList.remove("is-open");
+    $("#cmd-backdrop")?.classList.remove("is-open");
+    $("#cmd-palette")?.setAttribute("aria-hidden", "true");
+  }
+
+  function openContactModal() {
+    closePalette();
+    const m = $("#contact-modal");
+    const b = $("#modal-backdrop");
+    m?.classList.add("is-open");
+    b?.classList.add("is-open");
+    m?.setAttribute("aria-hidden", "false");
+  }
+
+  function closeContactModal() {
+    $("#contact-modal")?.classList.remove("is-open");
+    $("#modal-backdrop")?.classList.remove("is-open");
+    $("#contact-modal")?.setAttribute("aria-hidden", "true");
+  }
+
+  function scrollToId(id) {
+    closePalette();
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function downloadCv() {
+    const a = document.createElement("a");
+    a.href = "./assets/Yousef_Zaqout_CV.pdf";
+    a.download = "Yousef_Zaqout_CV.pdf";
+    a.rel = "noopener";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
+  const COMMANDS = [
+    {
+      id: "help",
+      label: "help",
+      hint: "List available commands",
+      run: () => {
+        const input = $("#cmd-input");
+        if (input) input.value = "help";
+        renderCmdResults("help");
+      },
+    },
+    {
+      id: "skills",
+      label: "skills",
+      hint: "Jump to tech stack badges",
+      run: () => scrollToId("tech-stack"),
+    },
+    {
+      id: "projects",
+      label: "projects",
+      hint: "Jump to case studies",
+      run: () => scrollToId("projects"),
+    },
+    {
+      id: "contact",
+      label: "curl /contact",
+      hint: "Smooth scroll to contact",
+      aliases: ["contact", "curl /contact", "curl/contact"],
+      run: () => scrollToId("contact"),
+    },
+    {
+      id: "cv",
+      label: "download-cv",
+      hint: "Download CV (PDF)",
+      aliases: ["download-cv", "cv", "resume"],
+      run: () => {
+        downloadCv();
+        closePalette();
+      },
+    },
+    {
+      id: "rigor",
+      label: "perf",
+      hint: "Engineering rigor / N+1 demo",
+      aliases: ["perf", "rigor", "n+1"],
+      run: () => scrollToId("rigor"),
+    },
+  ];
+
+  function matchCommand(query) {
+    const q = query.trim().toLowerCase();
+    return COMMANDS.filter((c) => {
+      const aliases = [c.label, c.id, ...(c.aliases || [])].map((s) => s.toLowerCase());
+      return aliases.some((a) => a.includes(q) || q.includes(a)) || c.hint.toLowerCase().includes(q);
+    });
+  }
+
+  function renderCmdResults(q) {
+    const list = $("#cmd-results");
+    if (!list) return;
+    const query = q.trim().toLowerCase();
+    const i18n = t();
+    const hits = !query || query === "help" ? COMMANDS : matchCommand(query);
+    if (!hits.length) {
+      list.innerHTML = `<p class="cmd-empty">No commands match <bdi dir="ltr">${escapeHtml(query)}</bdi></p>`;
+      return;
+    }
+    list.innerHTML = hits
+      .map(
+        (c) =>
+          `<button type="button" class="cmd-item" data-cmd="${c.id}"><code>${escapeHtml(c.label)}</code><span>${escapeHtml(
+            i18n.cmd?.[c.id] || c.hint
+          )}</span></button>`
+      )
+      .join("");
+    $$(".cmd-item", list).forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const cmd = COMMANDS.find((c) => c.id === btn.dataset.cmd);
+        if (cmd) {
+          window.YZAnalytics?.track("cmd_palette_exec", {
+            command_id: cmd.id,
+            command_label: cmd.label,
+            source: "click",
+          });
+          cmd.run();
+        }
+        playClick();
+      });
+    });
+  }
+
+  function resolveCommand(query) {
+    const q = query.trim().toLowerCase();
+    if (!q) return null;
+    const exact = COMMANDS.find((c) => {
+      const aliases = [c.label, c.id, ...(c.aliases || [])].map((s) => s.toLowerCase());
+      return aliases.includes(q);
+    });
+    if (exact) return exact;
+    const hits = matchCommand(q);
+    return hits[0] || null;
+  }
+
+  function runCommandById(id, source = "id") {
+    const cmd = COMMANDS.find((c) => c.id === id);
+    if (!cmd) return;
+    window.YZAnalytics?.track("cmd_palette_exec", {
+      command_id: cmd.id,
+      command_label: cmd.label,
+      source,
+    });
+    cmd.run();
+    playClick();
+  }
+
+  function initHotkeyBadge() {
+    const isMac = /Mac|iPhone|iPad|iPod/i.test(navigator.platform || "") || navigator.userAgent.includes("Mac");
+    const label = isMac ? "⌘K" : "Ctrl+K";
+    const badge = $("#cmd-hotkey");
+    const btn = $("#cmd-open");
+    if (badge) badge.textContent = label;
+    if (btn) {
+      btn.setAttribute("aria-label", `Open command palette (${label})`);
+      btn.setAttribute("title", `Open command palette (${label})`);
+    }
+  }
+
+  function initPalette() {
+    initHotkeyBadge();
+    $("#cmd-open")?.addEventListener("click", openPalette);
+    $("#cmd-close")?.addEventListener("click", closePalette);
+    $("#cmd-backdrop")?.addEventListener("click", closePalette);
+    $("#cmd-input")?.addEventListener("input", (e) => renderCmdResults(e.target.value));
+    $("#cmd-input")?.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter") return;
+      e.preventDefault();
+      const value = e.target.value || "";
+      const cmd = resolveCommand(value);
+      if (cmd) {
+        runCommandById(cmd.id, "enter");
+        return;
+      }
+      const first = $(".cmd-item");
+      first?.click();
+    });
+    document.addEventListener("keydown", (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        const open = $("#cmd-palette")?.classList.contains("is-open");
+        open ? closePalette() : openPalette();
+      }
+      if (e.key === "Escape") {
+        closePalette();
+        closeDrawer();
+        closeContactModal();
+      }
+    });
+    $("#modal-close")?.addEventListener("click", closeContactModal);
+    $("#modal-backdrop")?.addEventListener("click", closeContactModal);
+  }
+
+  /* —— Telemetry —— */
+  function initTelemetry() {
+    const edge = $("#telemetry-edge");
+    if (!edge) return;
+    setInterval(() => {
+      const ms = 14 + Math.floor(Math.random() * 12);
+      edge.textContent = `${ms}ms`;
+    }, 4000);
+  }
+
+  /* —— Audio mute —— */
+  function initAudioToggle() {
+    const btn = $("#audio-toggle");
+    if (!btn) return;
+    const sync = () => {
+      btn.classList.toggle("is-muted", !state.audio);
+      btn.setAttribute("aria-pressed", state.audio ? "true" : "false");
+      btn.title = state.audio ? "Mute keypress" : "Unmute keypress";
+    };
+    sync();
+    btn.addEventListener("click", () => {
+      state.audio = !state.audio;
+      localStorage.setItem("yz-audio", state.audio ? "1" : "0");
+      sync();
+    });
+  }
+
+  /* —— N+1 comparison —— */
+  function initRigor() {
+    const root = $("#rigor");
+    if (!root) return;
+    const bars = $$("[data-bar]", root);
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            bars.forEach((b) => {
+              b.style.width = b.dataset.bar;
+            });
+            io.disconnect();
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+    io.observe(root);
+  }
+
+  function init() {
+    initSandbox();
+    initArchitecture();
+    initOpenApi();
+    initPalette();
+    initTelemetry();
+    initAudioToggle();
+    initRigor();
+  }
+
+  return { init, openPalette, openDrawer, openContactModal, closeDrawer, closePalette };
+})();
