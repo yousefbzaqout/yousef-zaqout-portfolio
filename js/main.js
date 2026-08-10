@@ -202,8 +202,8 @@ return cache()->remember('metrics', 60, fn () =>
 
     document.title =
       lang === "ar"
-        ? "يوسف زقوت | مهندس Backend أول"
-        : "Yousef Zaqout | Senior Backend Engineer";
+        ? "يوسف زقوت | مهندس Backend"
+        : "Yousef Zaqout | Backend Engineer";
 
     const metaDesc = $('meta[name="description"]');
     if (metaDesc) {
