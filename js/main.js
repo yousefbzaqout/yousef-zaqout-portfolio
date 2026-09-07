@@ -32,7 +32,7 @@ return cache()->remember('metrics', 60, fn () =>
   function isolateTechHtml(str) {
     const escaped = escapeHtml(str);
     return escaped.replace(
-      /(?:&lt;\s*)?\d+(?:\.\d+)?(?:\s*(?:ms|s|MB|%))?|%|\b(?:N\+1|REST(?:ful)?|API(?:s)?|RAG|LLM|RBAC|SOLID|OpenAPI|Swagger|Postman|PostgreSQL|Postgres|Redis|Docker|Laravel(?:\s+\d+)?|Stripe|Moyasar|Tap|OpenAI|Vue(?:\s*\d+)?|PHP|GitHub|Sanctum|JSON|cURL|Telegram|Scrum(?:\s+Master)?|Areisto|Clean\s+Architecture|Composition\s+API|Backend)(?:\/[A-Za-z]+)?\b|[A-Za-z][\w]*(?:\/[\w.]+)+(?:\.php)?|[A-Za-z]\w*::\w+|\/v\d+\/[\w\-\/]+|"cached"\s*:\s*true|200\s+OK|routes\/api\.php/gi,
+      /(?:&lt;\s*)?\d+(?:\.\d+)?(?:\s*(?:ms|s|MB|%))?|%|\b(?:N\+1|REST(?:ful)?|API(?:s)?|RAG|LLM|RBAC|SOLID|HMAC|SLA|OpenAPI|Swagger|Postman|PostgreSQL|Postgres|pgvector|Redis|Docker|Laravel(?:\s+\d+)?|Filament(?:\s+v?\d+)?|Horizon|OpenRouter|Stripe|Moyasar|Tap|OpenAI|Vue(?:\s*\d+)?|PHP|GitHub|Sanctum|JSON|JSONB|cURL|Telegram|TikTok|Snapchat|LinkedIn|Google\s+Ads|Meta|n8n|FirstTouch|OWASP(?:\s+ZAP)?|Dusk|k6|ROAS|SaaS|CI\/CD|AdPilot|Scrum(?:\s+Master)?|Areisto|Clean\s+Architecture|Composition\s+API|Backend)(?:\/[A-Za-z]+)?\b|[A-Za-z][\w]*(?:\/[\w.]+)+(?:\.php)?|[A-Za-z]\w*::\w+|\/v\d+\/[\w\-\/]+|"cached"\s*:\s*true|200\s+OK|routes\/api\.php/gi,
       (match) => `<bdi dir="ltr">${match}</bdi>`
     );
   }

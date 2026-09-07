@@ -741,11 +741,10 @@ main {
   font-family: ui-monospace, Menlo, Consolas, monospace;
   font-size: 0.75rem;
   color: var(--text-muted);
-  overflow-x: auto;
-  overflow-y: hidden;
-  text-overflow: clip;
-  white-space: nowrap;
-  -webkit-overflow-scrolling: touch;
+  overflow: hidden;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
   unicode-bidi: isolate;
 }
 
@@ -759,13 +758,15 @@ main {
   font-size: 0.75rem;
   line-height: 1.65;
   color: #cbd5e1;
-  overflow-x: auto;
+  overflow-x: hidden;
   overflow-y: auto;
-  white-space: pre;
-  word-break: normal;
-  -webkit-overflow-scrolling: touch;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
   max-width: 100%;
   unicode-bidi: isolate;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(16, 185, 129, 0.35) transparent;
 }
 
 .sandbox-meta {
@@ -1185,6 +1186,10 @@ section {
   transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s var(--ease);
 }
 
+.case-card[hidden] {
+  display: none !important;
+}
+
 .case-card:hover {
   transform: translateY(-4px);
   border-color: var(--border-strong);
@@ -1241,6 +1246,76 @@ section {
   margin-bottom: 1.1rem;
 }
 
+/* Portfolio pagination */
+.mt-12 {
+  margin-top: 3rem;
+}
+
+.portfolio-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.portfolio-pagination[hidden] {
+  display: none !important;
+}
+
+.page-numbers {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.page-btn,
+.page-num {
+  appearance: none;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 0.85rem;
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s, border-color 0.2s, box-shadow 0.2s, transform 0.2s var(--ease);
+}
+
+.page-num {
+  min-width: 2.4rem;
+  text-align: center;
+}
+
+.page-btn:hover:not(:disabled),
+.page-num:hover {
+  color: #6ee7b7;
+  border-color: rgba(16, 185, 129, 0.45);
+  background: rgba(16, 185, 129, 0.08);
+  box-shadow: 0 0 18px rgba(16, 185, 129, 0.12);
+}
+
+.page-num.is-active {
+  color: #6ee7b7;
+  background: rgba(16, 185, 129, 0.14);
+  border-color: rgba(16, 185, 129, 0.55);
+  box-shadow: 0 0 22px rgba(16, 185, 129, 0.18);
+}
+
+.page-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.page-btn:focus-visible,
+.page-num:focus-visible {
+  outline: 2px solid rgba(16, 185, 129, 0.55);
+  outline-offset: 2px;
+}
+
 /* Architecture diagrams */
 .arch-frame {
   background: var(--surface);
@@ -1253,17 +1328,21 @@ section {
 .arch-chrome {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 0.75rem;
   padding: 0.7rem 0.95rem;
   background: rgba(255, 255, 255, 0.03);
   border-bottom: 1px solid var(--border);
 }
 
+.arch-chrome .ide-dots {
+  flex-shrink: 0;
+}
+
 .arch-title {
   font-family: ui-monospace, Menlo, Consolas, monospace;
   font-size: 0.72rem;
   color: var(--text-dim);
+  margin-inline-end: auto;
 }
 
 .arch-chip {
@@ -1853,21 +1932,14 @@ bdi,
 /* —— Sandbox extensions —— */
 .endpoint-switcher {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   gap: 0.4rem;
   margin-bottom: 0.75rem;
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  padding-bottom: 0.15rem;
-  /* Pull to edge of sandbox padding so scroll doesn't eat layout margins */
-  margin-inline: -0.15rem;
-  padding-inline: 0.15rem;
+  overflow: visible;
 }
 
 .endpoint-switcher .ep-btn {
-  flex: 0 0 auto;
+  flex: 0 1 auto;
   white-space: nowrap;
 }
 
@@ -1972,18 +2044,43 @@ bdi[dir="ltr"],
   font-size: 0.72rem;
   line-height: 1.55;
   resize: vertical;
-  overflow-x: auto;
-  white-space: pre;
-  -webkit-overflow-scrolling: touch;
+  overflow-x: hidden;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
   box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(16, 185, 129, 0.35) transparent;
 }
 
 .sandbox-prompt {
   flex-wrap: wrap;
+  align-items: flex-start;
 }
 
 .sandbox-prompt code {
   font-family: "JetBrains Mono", ui-monospace, monospace;
+}
+
+.sandbox-prompt .btn {
+  flex-shrink: 0;
+  margin-top: 0.05rem;
+}
+
+.api-sandbox,
+.sandbox-prompt,
+.endpoint-switcher {
+  scrollbar-width: none;
+}
+
+.api-sandbox::-webkit-scrollbar,
+.sandbox-prompt::-webkit-scrollbar,
+.endpoint-switcher::-webkit-scrollbar,
+.sandbox-prompt code::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 .ide-frame,
@@ -2673,9 +2770,10 @@ body.drawer-open {
   .sandbox-prompt code {
     flex-basis: 100%;
     order: 3;
-    white-space: nowrap;
-    overflow-x: auto;
-    text-overflow: clip;
+    white-space: pre-wrap;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    word-break: break-word;
   }
 
   .cmd-palette {
@@ -2762,17 +2860,25 @@ body.drawer-open {
 
   .ide-code,
   .rigor-code,
-  .sandbox-output,
-  .sandbox-payload,
   .oa-path pre {
     font-size: 0.68rem;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
 
+  .sandbox-output,
+  .sandbox-payload {
+    font-size: 0.68rem;
+    overflow-x: hidden;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
   .sandbox-badge {
     max-width: 100%;
-    overflow-x: auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
   }
 

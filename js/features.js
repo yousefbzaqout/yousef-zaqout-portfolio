@@ -84,6 +84,96 @@ window.YZFeatures = (function () {
       badges: ["Clean Arch", "SOLID", "Queues"],
       why: "Domain services and use-cases live here — controllers stay thin, business rules stay testable.",
     },
+    filament: {
+      title: "Filament Admin",
+      badges: ["Filament v3", "Panels", "RBAC"],
+      why: "Operator control panel for campaigns, content approval queues, and account connectors — without bloating the public API surface.",
+    },
+    horizon: {
+      title: "Redis / Horizon",
+      badges: ["Queues", "Workers", "Retries"],
+      why: "Async job processing for AI generation, publish pipelines, and budget checks — keeps the request path responsive under load.",
+    },
+    openrouter: {
+      title: "OpenRouter / LLM",
+      badges: ["LLM", "Drivers", "Tone"],
+      why: "Pluggable AI content generation drivers with tone controls — human approval gates every publish step.",
+    },
+    oauth: {
+      title: "OAuth Connectors",
+      badges: ["Google Ads", "Social", "Tokens"],
+      why: "Secure OAuth bridges to Google Ads and social platforms so accounts stay unified without storing raw credentials.",
+    },
+    connect: {
+      title: "Connect Account",
+      badges: ["OAuth", "Sandbox", "Encrypted"],
+      why: "Filament Connected Accounts + /social/* OAuth (LinkedIn, Google Ads) or sandbox connectors (X, YouTube, TikTok, Snapchat). Tokens encrypted on connected_accounts; RefreshConnectedAccountTokenJob every 30m.",
+    },
+    generate: {
+      title: "Generate AI Content",
+      badges: ["AIAction", "Quota", "LLM"],
+      why: "Filament AI Actions dispatch GenerateAIContentJob (default queue). QuotaService checks plan limits, then AIManager drives OpenRouter / Anthropic / Fake via AI_PRIMARY_DRIVER.",
+    },
+    approve: {
+      title: "Approve AI Action",
+      badges: ["Human Gate", "Status FSM"],
+      why: "AIActionService enforces ActionStatus transitions. Actionable outputs land in pending_approval; passive ones mark executed. Approve → approved → ExecuteAIActionJob on social-publishing.",
+    },
+    publish: {
+      title: "Publish Social",
+      badges: ["Drivers", "Horizon", "LinkedIn/X"],
+      why: "ExecuteAIActionJob marks executing, resolves ConnectedAccount, publishes via SocialDriverFactory (LinkedIn / X / YouTube), then executed or failed with execution_result.",
+    },
+    sync: {
+      title: "Sync Ad Metrics",
+      badges: ["Ad Drivers", "Hourly"],
+      why: "SyncAdCampaignMetricsJob (default queue) pulls campaign metrics through AdDriverFactory — Google Ads, TikTok Ads, Snapchat Ads. Scheduled hourly; also Filament / ads:dispatch.",
+    },
+    analyze: {
+      title: "Process Ad Analytics",
+      badges: ["KPI", "Pipeline", "JSONB"],
+      why: "AnalyzeAdPerformanceJob runs ProcessAdAnalyticsPipeline: FetchLatestMetrics → CalculateKpi → GenerateOpenRouterInsights. Insights persist as ad_recommendations.",
+    },
+    recs: {
+      title: "Ad Recommendations",
+      badges: ["Insights", "OpenRouter"],
+      why: "Structured optimization actions (pause / adjust budget / creative-only) stored in ad_recommendations after the analytics pipeline stages complete.",
+    },
+    apply: {
+      title: "Apply or Dismiss",
+      badges: ["Guardrails", "Ads"],
+      why: "ApplyAdRecommendationService + AdDriverFactory apply or dismiss recs. CheckAdBudgetGuardrailsJob every 30m enforces spend limits from ads guardrails config.",
+    },
+    hmac: {
+      title: "HMAC Webhook Ingestion",
+      badges: ["Fail-closed", "Multi-channel", "Redis Lock"],
+      why: "WebhookController resolves tenant + source, validates adapter HMAC/API key fail-closed, acquires Redis lead_lock:{externalLeadId} (300s), then dispatches ProcessLeadIngestionJob on the high queue.",
+    },
+    sla: {
+      title: "Laravel 13 SLA Engine",
+      badges: ["Business Hours", "Timezone", "SOLID"],
+      why: "LeadProcessingPipeline assigns via ContextAwareRoutingService, CalculateSlaDeadlinePipe uses working hours + SlaCalculatorService. Scheduler: 50% warn → 80% reassign → full breach escalate.",
+    },
+    pgvector: {
+      title: "PostgreSQL + pgvector",
+      badges: ["PG 18", "JSONB", "Embeddings"],
+      why: "Tenant-scoped lead store plus knowledge_chunks.embedding via pgvector. VectorSearchService backs confidence-gated RAG inference for ProcessAiResponseJob.",
+    },
+    "ft-horizon": {
+      title: "Redis / Horizon Queues",
+      badges: ["high", "notifications", "default"],
+      why: "Horizon runs ProcessLeadIngestionJob & ProcessAiResponseJob on high; SLA/Telegram/outbound webhooks on notifications; knowledge ingestion on default. Redis also holds lead_lock:*.",
+    },
+    rag: {
+      title: "Confidence-Gated RAG",
+      badges: ["Credits", "Threshold", "Human Fallback"],
+      why: "RagInferenceService embeds the brief, searches pgvector, compares confidence to TenantSetting.ai_confidence_threshold, then OpenRouterLlmService — low confidence routes to human / manager alert.",
+    },
+    n8n: {
+      title: "n8n / Telegram Alerts",
+      badges: ["Escalation", "Automation", "Callbacks"],
+      why: "NotificationDriverFactory fans out assignment, 50%/80%/breach alerts to Telegram, n8n, or outbound HMAC webhooks. TelegramWebhookController handles claim/reply callbacks into LeadWorkflowService.",
+    },
     redis: {
       title: "Redis Cache",
       badges: ["Cache", "Sessions", "Rate limit"],
@@ -117,6 +207,123 @@ window.YZFeatures = (function () {
   };
 
   const OPENAPI = {
+    "ad-pilot": {
+      title: "AdPilot SaaS API",
+      version: "1.0.0",
+      baseUrl: "https://api.adpilot.demo/v1",
+      auth: "Bearer Sanctum token",
+      paths: [
+        {
+          method: "GET",
+          path: "/social/linkedin/redirect",
+          summary: "Start LinkedIn OAuth → connected_accounts (encrypted tokens)",
+          response: { redirect: "https://www.linkedin.com/oauth/v2/authorization", platform: "linkedin" },
+        },
+        {
+          method: "POST",
+          path: "/ai-actions/generate",
+          summary: "Dispatch GenerateAIContentJob (quota check → AIManager LLM)",
+          body: { platform: "linkedin", prompt: "spring launch", tone: "confident", locale: "ar" },
+          response: {
+            job: "GenerateAIContentJob",
+            queue: "default",
+            status: "pending_approval",
+            table: "ai_actions",
+          },
+        },
+        {
+          method: "POST",
+          path: "/ai-actions/{id}/approve",
+          summary: "Approve → ExecuteAIActionJob on social-publishing queue",
+          body: { transition: "approved" },
+          response: {
+            status: "approved",
+            dispatched: "ExecuteAIActionJob",
+            queue: "social-publishing",
+            driver: "SocialDriverFactory",
+          },
+        },
+        {
+          method: "POST",
+          path: "/ads/dispatch",
+          summary: "Sync metrics + run ProcessAdAnalyticsPipeline → recommendations",
+          body: { jobs: ["SyncAdCampaignMetricsJob", "AnalyzeAdPerformanceJob"] },
+          response: {
+            ad_metrics: "synced",
+            pipeline: ["FetchLatestMetrics", "CalculateKpi", "GenerateOpenRouterInsights"],
+            ad_recommendations: [{ action: "adjust_budget", min_roas: 2.5 }],
+          },
+        },
+      ],
+    },
+    "firsttouch-sla": {
+      title: "FirstTouch SLA API",
+      version: "1.0.0",
+      baseUrl: "https://api.firsttouch.demo/api",
+      auth: "HMAC webhooks · Bearer Sanctum (developer:*)",
+      paths: [
+        {
+          method: "POST",
+          path: "/v1/webhooks/meta/{tenant_id}",
+          summary: "Inbound Meta lead — fail-closed HMAC → ProcessLeadIngestionJob (high)",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Hub-Signature-256": "sha256=<hmac>",
+          },
+          body: {
+            entry: [{ changes: [{ value: { leadgen_id: "ext-1", field_data: [] } }] }],
+          },
+          response: {
+            status: "accepted",
+            downstream: "LeadProcessingPipeline",
+            pipes: [
+              "VerifyIdempotencyPipe",
+              "AssignRoundRobinSalesPipe",
+              "CalculateSlaDeadlinePipe",
+              "PersistLeadPipe",
+              "DispatchAiResponsePipe",
+            ],
+          },
+        },
+        {
+          method: "POST",
+          path: "/v1/webhooks/website/{tenant_id}",
+          summary: "Website form webhook — API key auth, 201 on accept",
+          headers: { "X-Api-Key": "<website-key>", Accept: "application/json" },
+          body: { name: "Sara", phone: "+9705…", email: "sara@example.com" },
+          response: { success: true, message: "Lead accepted", source: "website" },
+        },
+        {
+          method: "POST",
+          path: "/v1/webhooks/telegram/{tenant_id}",
+          summary: "Telegram bot callbacks — claim / reply → LeadWorkflowService",
+          headers: { "X-Telegram-Bot-Api-Secret-Token": "<secret>" },
+          response: { ok: true, action: "mark_in_progress", sla_status: "met" },
+        },
+        {
+          method: "GET",
+          path: "/v1/developer/leads",
+          summary: "Developer API — list tenant leads (Sanctum abilities:developer:*)",
+          headers: { Authorization: "Bearer {token}", Accept: "application/json" },
+          response: {
+            data: [{ id: 42, external_lead_id: "ext-1", sla_status: "running", source: "meta" }],
+            meta: { per_page: 15, total: 128 },
+          },
+        },
+        {
+          method: "GET",
+          path: "/v1/developer/analytics/sla-summary",
+          summary: "SLA compliance summary — live adherence & queue depth",
+          headers: { Authorization: "Bearer {token}", Accept: "application/json" },
+          response: {
+            compliance_rate: 0.94,
+            median_first_action_minutes: 3.2,
+            breached: 4,
+            queue_depth: 11,
+          },
+        },
+      ],
+    },
     irada: {
       title: "Irada Academy API",
       version: "1.2.0",
@@ -790,6 +997,90 @@ window.YZFeatures = (function () {
     });
   }
 
+  /* —— Portfolio pagination (3 per page) —— */
+  const ITEMS_PER_PAGE = 3;
+
+  function initPortfolioPagination() {
+    const nav = $("#portfolio-pagination");
+    const list = $(".portfolio-list");
+    if (!nav || !list) return;
+
+    const projects = $$("[data-case]", list);
+    const totalPages = Math.max(1, Math.ceil(projects.length / ITEMS_PER_PAGE));
+    const numbersEl = $("[data-page-numbers]", nav);
+    const prevBtn = $("[data-page-nav='prev']", nav);
+    const nextBtn = $("[data-page-nav='next']", nav);
+    let currentPage = 1;
+
+    if (totalPages <= 1) {
+      nav.hidden = true;
+      projects.forEach((card) => {
+        card.hidden = false;
+        card.classList.add("is-visible");
+      });
+      return;
+    }
+
+    nav.hidden = false;
+
+    function scrollToProjects() {
+      const target = $("#projects") || $("#work");
+      if (!target) return;
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function renderPage(page, { scroll } = { scroll: false }) {
+      currentPage = Math.min(Math.max(1, page), totalPages);
+      const start = (currentPage - 1) * ITEMS_PER_PAGE;
+      const end = currentPage * ITEMS_PER_PAGE;
+
+      projects.forEach((card, i) => {
+        const on = i >= start && i < end;
+        card.hidden = !on;
+        if (on) card.classList.add("is-visible");
+      });
+
+      if (numbersEl) {
+        numbersEl.innerHTML = Array.from({ length: totalPages }, (_, idx) => {
+          const n = idx + 1;
+          const active = n === currentPage ? " is-active" : "";
+          return `<button type="button" class="page-num${active}" data-page="${n}" aria-label="Page ${n}" aria-current="${
+            n === currentPage ? "page" : "false"
+          }">${n}</button>`;
+        }).join("");
+      }
+
+      if (prevBtn) prevBtn.disabled = currentPage === 1;
+      if (nextBtn) nextBtn.disabled = currentPage === totalPages;
+      if (scroll) scrollToProjects();
+    }
+
+    prevBtn?.addEventListener("click", () => {
+      if (currentPage > 1) {
+        playClick();
+        renderPage(currentPage - 1, { scroll: true });
+      }
+    });
+
+    nextBtn?.addEventListener("click", () => {
+      if (currentPage < totalPages) {
+        playClick();
+        renderPage(currentPage + 1, { scroll: true });
+      }
+    });
+
+    numbersEl?.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-page]");
+      if (!btn) return;
+      const page = Number(btn.dataset.page);
+      if (!Number.isFinite(page) || page === currentPage) return;
+      playClick();
+      renderPage(page, { scroll: true });
+    });
+
+    renderPage(1);
+  }
+
   /* —— N+1 comparison —— */
   function initRigor() {
     const root = $("#rigor");
@@ -819,6 +1110,7 @@ window.YZFeatures = (function () {
     initTelemetry();
     initAudioToggle();
     initRigor();
+    initPortfolioPagination();
   }
 
   return { init, openPalette, openDrawer, openContactModal, closeDrawer, closePalette };

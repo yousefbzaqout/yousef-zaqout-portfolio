@@ -43,11 +43,19 @@ ok("cache toggle", /data-cache="hit"/.test(html) && /data-cache="cold"/.test(htm
 ok("cmd palette", /id="cmd-palette"/.test(html));
 ok(
   "openapi drawers",
-  /data-openapi="irada"/.test(html) &&
+  /data-openapi="ad-pilot"/.test(html) &&
+    /data-openapi="firsttouch-sla"/.test(html) &&
+    /data-openapi="irada"/.test(html) &&
     /data-openapi="mostaql"/.test(html) &&
     /data-openapi="cv"/.test(html)
 );
-ok("arch diagrams", (html.match(/data-arch-diagram/g) || []).length >= 3);
+ok("arch diagrams", (html.match(/data-arch-diagram/g) || []).length >= 5);
+ok("portfolio pagination", /id="portfolio-pagination"/.test(html));
+ok("ad-pilot project", /data-project="ad-pilot"/.test(html) && /saas · ad-pilot/.test(html));
+ok(
+  "firsttouch-sla project",
+  /data-project="firsttouch-sla"/.test(html) && /engine · firsttouch-sla/.test(html)
+);
 ok("rigor section", /id="rigor"/.test(html) && /data-bar="100%"/.test(html));
 ok("projects anchor", /id="projects"/.test(html) && /id="tech-stack"/.test(html));
 
@@ -55,11 +63,18 @@ const feat = fs.readFileSync("js/features.js", "utf8");
 ok("cv relative path", feat.includes("./assets/Yousef_Zaqout_CV.pdf"));
 ok("help command renders", feat.includes('renderCmdResults("help")'));
 ok("openapi bdi", feat.includes('<bdi dir="ltr">') && feat.includes("oa-method"));
+ok("pagination 3 per page", feat.includes("ITEMS_PER_PAGE = 3") && feat.includes("initPortfolioPagination"));
+ok("ad-pilot openapi", feat.includes('"ad-pilot"') && feat.includes("AdPilot SaaS API"));
+ok(
+  "firsttouch-sla openapi",
+  feat.includes('"firsttouch-sla"') && feat.includes("FirstTouch SLA API")
+);
 
 const css = fs.readFileSync("css/styles.css", "utf8");
 ok("overflow-x-auto util", css.includes(".overflow-x-auto"));
 ok("480px breakpoint", css.includes("max-width: 480px"));
-ok("sandbox code scrolls", /sandbox-prompt code[\s\S]*?overflow-x:\s*auto/.test(css));
+ok("sandbox code wraps", /sandbox-prompt code[\s\S]*?white-space:\s*pre-wrap/.test(css));
+ok("endpoint switcher wraps", /endpoint-switcher[\s\S]*?flex-wrap:\s*wrap/.test(css));
 
 checks.forEach((c) => console.log(`${c.pass ? "PASS" : "FAIL"}: ${c.name}${c.detail ? ` — ${c.detail}` : ""}`));
 const failed = checks.filter((c) => !c.pass);

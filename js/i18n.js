@@ -151,7 +151,35 @@ window.I18N = {
       lead: "Click architecture nodes to inspect decisions. Inspect OpenAPI without leaving the page.",
       openapi: "Interactive API Spec",
       archHint: "Click a node",
+      prev: "Previous",
+      next: "Next",
       cases: [
+        {
+          tags: ["LARAVEL 13", "FILAMENT 5", "PGVECTOR", "AI / RAG", "N8N / TELEGRAM"],
+          title: "FirstTouch SLA — AI Lead Routing & SLA Engine",
+          challenge:
+            "Fragmented acquisition channels (Meta, TikTok, Google, Snapchat) and delayed responses to leads due to timezone and business-hours mismatch.",
+          role: "Built a Laravel 13 SOLID system with fail-closed HMAC webhooks, Horizon queues (high / notifications), and a confidence-gated RAG engine on pgvector.",
+          solution:
+            "Webhook → Redis lead_lock → LeadProcessingPipeline that assigns, starts a timezone-aware SLA clock, optionally runs RAG, and escalates via Telegram / n8n at 50% · 80% · breach.",
+          outcome:
+            "Response time cut from hours to minutes, with live compliance rate, queue depth, and routing efficiency — plus a Sanctum Developer API for partners.",
+          link: "View on GitHub →",
+          href: "https://github.com/yousefbzaqout/firsttouch-sla",
+        },
+        {
+          tags: ["SAAS", "LARAVEL 13", "FILAMENT", "AI / LLM", "DOCKER"],
+          title: "AdPilot — AI SaaS for Ad Campaign & Content Management",
+          challenge:
+            "Managing ads and content across multiple platforms (Google Ads, TikTok, Snapchat, LinkedIn, X) causes fragmentation, delayed decisions, and budget waste.",
+          role: "Built Filament /admin + domain services (AI, Social, Ads, Analytics, Subscription) with Horizon-only external I/O on default and social-publishing queues.",
+          solution:
+            "End-to-end loop: Connect accounts → Generate AI content → Approve → Publish via social drivers → Sync ad metrics → Analyze KPIs → Recommendations → Apply/dismiss with budget guardrails.",
+          outcome:
+            "Production data-flow over PostgreSQL 18 (JSONB) and Redis/Horizon — controllers never call LLM or platform APIs directly; jobs retry with exponential backoff.",
+          link: "View on GitHub →",
+          href: "https://github.com/yousefbzaqout/ad-pilot",
+        },
         {
           tags: ["EdTech", "Laravel", "RBAC"],
           title: "Irada Academy Platform",
@@ -160,7 +188,7 @@ window.I18N = {
           role: "Built the backend architecture and RESTful APIs with Laravel; optimized queries; implemented secure role-based access control.",
           solution: "Clean, extensible API layer designed for course, user, and enrollment workflows.",
           outcome: "A reliable, fast e-learning backend with architecture ready to extend.",
-          link: "View on GitHub",
+          link: "View on GitHub →",
           href: "https://github.com/yousefbzaqout/irada-academy",
         },
         {
@@ -172,7 +200,7 @@ window.I18N = {
           solution: "Real-time scraping + filtered notification workflow via Telegram.",
           outcome:
             "Automated discovery with sub-second fetching and alerts under 5 seconds — less manual search, faster responses.",
-          link: "View on GitHub",
+          link: "View on GitHub →",
           href: "https://github.com/yousefbzaqout/mostaql-job-notifier-bot",
         },
         {
@@ -183,7 +211,7 @@ window.I18N = {
           role: "Built Laravel 12 API + Vue 3 (Composition API) + PostgreSQL + Docker, following SOLID & Clean Architecture.",
           solution: "Turn-key API surface with automated Docker setup for consistent local and production environments.",
           outcome: "Production-ready application with documented APIs ready for integration.",
-          link: "View on GitHub",
+          link: "View on GitHub →",
           href: "https://github.com/yousefbzaqout/cv-app",
         },
       ],
@@ -439,7 +467,35 @@ window.I18N = {
       lead: "انقر عقد الهندسة لفهم القرارات. افحص OpenAPI دون مغادرة الصفحة.",
       openapi: "مواصفات API تفاعلية",
       archHint: "انقر عقدة",
+      prev: "السابق",
+      next: "التالي",
       cases: [
+        {
+          tags: ["LARAVEL 13", "FILAMENT 5", "PGVECTOR", "AI / RAG", "N8N / TELEGRAM"],
+          title: "FirstTouch SLA — محرك توزيع العملاء وإدارة اتفاقية مستوى الخدمة بالذكاء الاصطناعي",
+          challenge:
+            "تشتت قنوات الوصول (Meta, TikTok, Google, Snapchat) وتأخر الرد على العملاء المحتملين بسبب تفاوت المناطق الزمنية وساعات العمل.",
+          role: "تطوير نظام بـ Laravel 13 بأسلوب SOLID، وتأمين الـ Webhooks بـ HMAC، مع دمج محرك RAG عبر pgvector لتقييم ثقة القرارات الآلية.",
+          solution:
+            "نظام آلي يلتقط العملاء فوراً، يفعل عداد SLA ذكي، يصعد التنبيهات عبر Telegram وn8n، ويحيل القرارات غير المؤكدة للتدخل البشري.",
+          outcome:
+            "انخفاض وقت الاستجابة من ساعات إلى دقائق معدودة، مع توفير مؤشرات لحظية لمعدل الالتزام وعمق طوابير الانتظار وكفاءة التوزيع.",
+          link: "عرض على GitHub →",
+          href: "https://github.com/yousefbzaqout/firsttouch-sla",
+        },
+        {
+          tags: ["SAAS", "LARAVEL 13", "FILAMENT", "AI / LLM", "DOCKER"],
+          title: "AdPilot — منصة SaaS لإدارة الحملات الإعلانية والمحتوى بالذكاء الاصطناعي",
+          challenge:
+            "إدارة الإعلانات والمحتوى عبر منصات متعددة (Google Ads, TikTok, Snapchat, LinkedIn, X) تسبب تشتت، تأخر بالقرارات، وهدر بالميزانية.",
+          role: "بناء Filament /admin مع خدمات النطاق (AI, Social, Ads, Analytics, Subscription) ومعالجة خارجية عبر Horizon فقط على طوابير default وsocial-publishing.",
+          solution:
+            "حلقة كاملة: ربط الحسابات → توليد محتوى AI → اعتماد → نشر عبر Social Drivers → مزامنة مقاييس الإعلانات → تحليل KPI → توصيات → تطبيق/رفض مع حماية الميزانية.",
+          outcome:
+            "تدفق بيانات إنتاجي على PostgreSQL 18 (JSONB) وRedis/Horizon — الـ Controllers لا تستدعي LLM أو APIs المنصات مباشرة؛ والوظائف تعيد المحاولة بتراجع أسي.",
+          link: "عرض على GitHub →",
+          href: "https://github.com/yousefbzaqout/ad-pilot",
+        },
         {
           tags: ["EdTech", "Laravel", "RBAC"],
           title: "منصة أكاديمية إرادة",
@@ -447,7 +503,7 @@ window.I18N = {
           role: "بناء هندسة Backend وواجهات REST بـ Laravel؛ تحسين الاستعلامات؛ تطبيق صلاحيات آمنة حسب الأدوار.",
           solution: "طبقة API نظيفة وقابلة للتوسع لمسارات الدورات والمستخدمين والتسجيل.",
           outcome: "Backend تعليمي موثوق وسريع بهندسة جاهزة للتوسعة.",
-          link: "عرض على GitHub",
+          link: "عرض على GitHub →",
           href: "https://github.com/yousefbzaqout/irada-academy",
         },
         {
@@ -457,7 +513,7 @@ window.I18N = {
           role: "تطوير بوت آلي لجلب المشاريع وتصفيتها وإرسال التنبيهات فوراً.",
           solution: "جلب بيانات فوري + مسار تنبيهات مصفّى عبر تيليجرام.",
           outcome: "اكتشاف آلي مع جلب شبه فوري وتنبيهات خلال أقل من 5 ثوانٍ — بحث أقل واستجابة أسرع.",
-          link: "عرض على GitHub",
+          link: "عرض على GitHub →",
           href: "https://github.com/yousefbzaqout/mostaql-job-notifier-bot",
         },
         {
@@ -467,7 +523,7 @@ window.I18N = {
           role: "بناء Laravel 12 API + Vue 3 + PostgreSQL + Docker وفق SOLID وClean Architecture.",
           solution: "سطح API جاهز للربط مع إعداد Docker آلي لبيئات متسقة.",
           outcome: "تطبيق جاهز للإنتاج مع توثيق API جاهز للتكامل.",
-          link: "عرض على GitHub",
+          link: "عرض على GitHub →",
           href: "https://github.com/yousefbzaqout/cv-app",
         },
       ],

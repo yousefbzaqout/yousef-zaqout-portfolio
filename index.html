@@ -225,7 +225,7 @@
                   <span class="sandbox-badge" dir="ltr"><bdi dir="ltr">GET /v1/metrics</bdi></span>
                 </div>
                 <div class="sandbox-body" dir="ltr">
-                  <div class="endpoint-switcher overflow-x-auto" role="tablist" aria-label="Endpoints">
+                  <div class="endpoint-switcher" role="tablist" aria-label="Endpoints">
                     <button type="button" class="ep-btn is-active" data-endpoint="metrics" role="tab">
                       <span class="ep-method get">GET</span>
                       <bdi dir="ltr">/v1/metrics</bdi>
@@ -264,7 +264,7 @@
 
                   <div class="sandbox-prompt">
                     <span class="sandbox-prompt-sign">$</span>
-                    <code id="sandbox-curl-preview" class="overflow-x-auto" dir="ltr"><bdi dir="ltr">curl https://api.demo/v1/metrics</bdi></code>
+                    <code id="sandbox-curl-preview" dir="ltr"><bdi dir="ltr">curl https://api.demo/v1/metrics</bdi></code>
                     <button type="button" class="btn btn-glass btn-sm" id="copy-curl">
                       <span data-i18n="sandbox.copyCurl">Copy as cURL</span>
                     </button>
@@ -273,7 +273,7 @@
                     </button>
                   </div>
                   <pre
-                    class="sandbox-output overflow-x-auto"
+                    class="sandbox-output"
                     id="sandbox-output"
                     dir="ltr"
                     aria-live="polite"
@@ -417,15 +417,197 @@
         <div id="projects" class="container">
           <div class="section-head reveal">
             <span class="section-badge" data-i18n="portfolio.label">Featured Case Studies</span>
-            <h2 data-i18n="portfolio.title">Proof in production-minded builds</h2>
+            <h2 data-i18n="portfolio.title">Proof-minded builds</h2>
             <p data-i18n="portfolio.lead">Click architecture nodes to inspect decisions. Inspect OpenAPI without leaving the page.</p>
           </div>
           <div class="portfolio-list">
+            <!-- FirstTouch SLA -->
+            <article class="case-card reveal" data-case data-project="firsttouch-sla">
+              <div class="case-media">
+                <div class="arch-frame">
+                  <div class="arch-chrome">
+                    <div class="ide-dots" aria-hidden="true">
+                      <span class="dot red"></span>
+                      <span class="dot yellow"></span>
+                      <span class="dot green"></span>
+                    </div>
+                    <span class="arch-title" dir="ltr"><bdi dir="ltr">engine · firsttouch-sla</bdi></span>
+                    <span class="arch-chip" data-i18n="portfolio.archHint">Click a node</span>
+                  </div>
+                  <div class="arch-canvas ratio-16x9" data-arch-diagram>
+                    <svg viewBox="0 0 640 360" class="arch-svg" role="img" aria-label="FirstTouch SLA system data-flow pipeline">
+                      <rect width="640" height="360" fill="#0c1220" />
+                      <path class="arch-edge" data-edge="hmac sla" d="M155 85 H200" stroke="#334155" stroke-width="2" />
+                      <path class="arch-edge" data-edge="sla ft-horizon pgvector rag n8n" d="M360 85 H400" stroke="#334155" stroke-width="2" />
+                      <path class="arch-edge" data-edge="sla ft-horizon" d="M280 125 V165" stroke="#334155" stroke-width="2" />
+                      <path class="arch-edge" data-edge="sla pgvector" d="M320 125 V165" stroke="#334155" stroke-width="2" />
+                      <path class="arch-edge" data-edge="ft-horizon rag" d="M200 230 H230" stroke="#334155" stroke-width="2" />
+                      <path class="arch-edge" data-edge="pgvector rag" d="M360 230 H390" stroke="#334155" stroke-width="2" />
+                      <path class="arch-edge" data-edge="rag n8n" d="M510 230 H530" stroke="#334155" stroke-width="2" />
+                      <g class="arch-node" data-node="hmac">
+                        <rect x="25" y="50" width="130" height="70" rx="10" fill="#111726" stroke="rgba(220,56,45,.5)" />
+                        <text x="90" y="78" text-anchor="middle" fill="#e2e8f0" font-size="11" font-family="system-ui" font-weight="600">HMAC Webhook</text>
+                        <text x="90" y="96" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="system-ui">Fail-closed</text>
+                      </g>
+                      <g class="arch-node" data-node="sla">
+                        <rect x="200" y="45" width="160" height="80" rx="10" fill="rgba(16,185,129,.12)" stroke="#10b981" />
+                        <text x="280" y="78" text-anchor="middle" fill="#e2e8f0" font-size="12" font-family="system-ui" font-weight="600">Laravel 13 SLA</text>
+                        <text x="280" y="98" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="system-ui">Business-hours Engine</text>
+                      </g>
+                      <g class="arch-node" data-node="ft-horizon">
+                        <rect x="50" y="180" width="140" height="60" rx="10" fill="#111726" stroke="rgba(220,56,45,.45)" />
+                        <text x="120" y="205" text-anchor="middle" fill="#e2e8f0" font-size="11" font-family="system-ui" font-weight="600">Redis / Horizon</text>
+                        <text x="120" y="223" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="system-ui">high · notifications</text>
+                      </g>
+                      <g class="arch-node" data-node="pgvector">
+                        <rect x="220" y="180" width="140" height="60" rx="10" fill="#111726" stroke="rgba(65,105,225,.5)" />
+                        <text x="290" y="205" text-anchor="middle" fill="#e2e8f0" font-size="11" font-family="system-ui" font-weight="600">PG + pgvector</text>
+                        <text x="290" y="223" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="system-ui">Tenant · Embeddings</text>
+                      </g>
+                      <g class="arch-node" data-node="rag">
+                        <rect x="390" y="180" width="130" height="60" rx="10" fill="#111726" stroke="rgba(16,163,127,.5)" />
+                        <text x="455" y="205" text-anchor="middle" fill="#e2e8f0" font-size="11" font-family="system-ui" font-weight="600">RAG Gate</text>
+                        <text x="455" y="223" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="system-ui">Confidence Threshold</text>
+                      </g>
+                      <g class="arch-node" data-node="n8n">
+                        <rect x="530" y="180" width="90" height="60" rx="10" fill="#111726" stroke="rgba(6,182,212,.45)" />
+                        <text x="575" y="205" text-anchor="middle" fill="#e2e8f0" font-size="11" font-family="system-ui" font-weight="600">n8n</text>
+                        <text x="575" y="223" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="system-ui">Telegram</text>
+                      </g>
+                      <text x="320" y="280" text-anchor="middle" fill="#64748b" font-size="10" font-family="system-ui">Meta · TikTok · Google · Snapchat · Website → WebhookController</text>
+                      <text x="320" y="302" text-anchor="middle" fill="#10b981" font-size="11" font-family="system-ui" font-weight="600">HMAC → lead_lock → ProcessLeadIngestionJob → LeadProcessingPipeline</text>
+                      <text x="320" y="324" text-anchor="middle" fill="#64748b" font-size="10" font-family="system-ui">50% warn → 80% reassign → breach escalate · Filament /admin + Developer API</text>
+                    </svg>
+                    <div class="arch-popover" hidden>
+                      <strong class="arch-pop-title"></strong>
+                      <div class="arch-pop-badges"></div>
+                      <p class="arch-pop-why"></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="case-body">
+                <div class="case-tags"></div>
+                <h3></h3>
+                <div class="casr-grid">
+                  <article class="casr-card" data-casr="challenge"><span class="casr-label"></span><p></p></article>
+                  <article class="casr-card" data-casr="role"><span class="casr-label"></span><p></p></article>
+                  <article class="casr-card" data-casr="solution"><span class="casr-label"></span><p></p></article>
+                  <article class="casr-card" data-casr="outcome"><span class="casr-label"></span><p></p></article>
+                </div>
+                <div class="case-actions">
+                  <a class="case-link" href="#" target="_blank" rel="noopener noreferrer"></a>
+                  <button type="button" class="btn btn-glass btn-sm" data-openapi="firsttouch-sla" data-i18n="portfolio.openapi">
+                    Interactive API Spec
+                  </button>
+                </div>
+              </div>
+            </article>
+
+            <!-- AdPilot -->
+            <article class="case-card reverse reveal" data-case data-project="ad-pilot">
+              <div class="case-media">
+                <div class="arch-frame">
+                  <div class="arch-chrome">
+                    <div class="ide-dots" aria-hidden="true">
+                      <span class="dot red"></span>
+                      <span class="dot yellow"></span>
+                      <span class="dot green"></span>
+                    </div>
+                    <span class="arch-title" dir="ltr"><bdi dir="ltr">saas · ad-pilot</bdi></span>
+                    <span class="arch-chip" data-i18n="portfolio.archHint">Click a node</span>
+                  </div>
+                  <div class="arch-canvas ratio-16x9" data-arch-diagram>
+                    <svg viewBox="0 0 640 360" class="arch-svg" role="img" aria-label="AdPilot system data-flow pipeline">
+                      <rect width="640" height="360" fill="#0c1220" />
+                      <!-- Master loop edges: Connect→Generate→Approve→Publish→Sync→Analyze→Recs→Apply -->
+                      <path class="arch-edge" data-edge="connect generate" d="M145 78 H175" stroke="#334155" stroke-width="2" />
+                      <path class="arch-edge" data-edge="generate approve" d="M295 78 H325" stroke="#334155" stroke-width="2" />
+                      <path class="arch-edge" data-edge="approve publish" d="M445 78 H475" stroke="#334155" stroke-width="2" />
+                      <path class="arch-edge" data-edge="publish sync" d="M535 118 V155" stroke="#334155" stroke-width="2" />
+                      <path class="arch-edge" data-edge="sync analyze" d="M475 195 H445" stroke="#334155" stroke-width="2" />
+                      <path class="arch-edge" data-edge="analyze recs" d="M325 195 H295" stroke="#334155" stroke-width="2" />
+                      <path class="arch-edge" data-edge="recs apply" d="M175 195 H145" stroke="#334155" stroke-width="2" />
+                      <g class="arch-node" data-node="connect">
+                        <rect x="25" y="48" width="120" height="60" rx="10" fill="#111726" stroke="rgba(99,91,255,.5)" />
+                        <text x="85" y="73" text-anchor="middle" fill="#e2e8f0" font-size="12" font-family="system-ui" font-weight="600">Connect</text>
+                        <text x="85" y="91" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="system-ui">OAuth · Accounts</text>
+                      </g>
+                      <g class="arch-node" data-node="generate">
+                        <rect x="175" y="48" width="120" height="60" rx="10" fill="rgba(16,185,129,.12)" stroke="#10b981" />
+                        <text x="235" y="73" text-anchor="middle" fill="#e2e8f0" font-size="12" font-family="system-ui" font-weight="600">Generate</text>
+                        <text x="235" y="91" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="system-ui">AI Content Job</text>
+                      </g>
+                      <g class="arch-node" data-node="approve">
+                        <rect x="325" y="48" width="120" height="60" rx="10" fill="#111726" stroke="rgba(6,182,212,.45)" />
+                        <text x="385" y="73" text-anchor="middle" fill="#e2e8f0" font-size="12" font-family="system-ui" font-weight="600">Approve</text>
+                        <text x="385" y="91" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="system-ui">Human Gate</text>
+                      </g>
+                      <g class="arch-node" data-node="publish">
+                        <rect x="475" y="48" width="140" height="60" rx="10" fill="#111726" stroke="rgba(16,163,127,.5)" />
+                        <text x="545" y="73" text-anchor="middle" fill="#e2e8f0" font-size="12" font-family="system-ui" font-weight="600">Publish</text>
+                        <text x="545" y="91" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="system-ui">Social Drivers</text>
+                      </g>
+                      <g class="arch-node" data-node="sync">
+                        <rect x="475" y="165" width="140" height="60" rx="10" fill="#111726" stroke="rgba(220,56,45,.45)" />
+                        <text x="545" y="190" text-anchor="middle" fill="#e2e8f0" font-size="12" font-family="system-ui" font-weight="600">Sync</text>
+                        <text x="545" y="208" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="system-ui">Ad Metrics</text>
+                      </g>
+                      <g class="arch-node" data-node="analyze">
+                        <rect x="325" y="165" width="120" height="60" rx="10" fill="#111726" stroke="rgba(65,105,225,.5)" />
+                        <text x="385" y="190" text-anchor="middle" fill="#e2e8f0" font-size="12" font-family="system-ui" font-weight="600">Analyze</text>
+                        <text x="385" y="208" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="system-ui">KPI Pipeline</text>
+                      </g>
+                      <g class="arch-node" data-node="recs">
+                        <rect x="175" y="165" width="120" height="60" rx="10" fill="#111726" stroke="rgba(251,191,36,.45)" />
+                        <text x="235" y="190" text-anchor="middle" fill="#e2e8f0" font-size="12" font-family="system-ui" font-weight="600">Recs</text>
+                        <text x="235" y="208" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="system-ui">OpenRouter</text>
+                      </g>
+                      <g class="arch-node" data-node="apply">
+                        <rect x="25" y="165" width="120" height="60" rx="10" fill="rgba(16,185,129,.12)" stroke="#10b981" />
+                        <text x="85" y="190" text-anchor="middle" fill="#e2e8f0" font-size="12" font-family="system-ui" font-weight="600">Apply</text>
+                        <text x="85" y="208" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="system-ui">Guardrails</text>
+                      </g>
+                      <text x="320" y="270" text-anchor="middle" fill="#64748b" font-size="11" font-family="system-ui">Filament /admin → Domain services → Drivers → PG 18 · Redis/Horizon</text>
+                      <text x="320" y="295" text-anchor="middle" fill="#10b981" font-size="11" font-family="system-ui" font-weight="600">Connect → Generate → Approve → Publish → Sync → Analyze → Recs → Apply</text>
+                      <text x="320" y="320" text-anchor="middle" fill="#64748b" font-size="10" font-family="system-ui">External I/O only via Horizon · queues: default + social-publishing</text>
+                    </svg>
+                    <div class="arch-popover" hidden>
+                      <strong class="arch-pop-title"></strong>
+                      <div class="arch-pop-badges"></div>
+                      <p class="arch-pop-why"></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="case-body">
+                <div class="case-tags"></div>
+                <h3></h3>
+                <div class="casr-grid">
+                  <article class="casr-card" data-casr="challenge"><span class="casr-label"></span><p></p></article>
+                  <article class="casr-card" data-casr="role"><span class="casr-label"></span><p></p></article>
+                  <article class="casr-card" data-casr="solution"><span class="casr-label"></span><p></p></article>
+                  <article class="casr-card" data-casr="outcome"><span class="casr-label"></span><p></p></article>
+                </div>
+                <div class="case-actions">
+                  <a class="case-link" href="#" target="_blank" rel="noopener noreferrer"></a>
+                  <button type="button" class="btn btn-glass btn-sm" data-openapi="ad-pilot" data-i18n="portfolio.openapi">
+                    Interactive API Spec
+                  </button>
+                </div>
+              </div>
+            </article>
+
             <!-- Irada -->
             <article class="case-card reveal" data-case data-project="irada">
               <div class="case-media">
                 <div class="arch-frame">
                   <div class="arch-chrome">
+                    <div class="ide-dots" aria-hidden="true">
+                      <span class="dot red"></span>
+                      <span class="dot yellow"></span>
+                      <span class="dot green"></span>
+                    </div>
                     <span class="arch-title" dir="ltr"><bdi dir="ltr">system · irada-academy</bdi></span>
                     <span class="arch-chip" data-i18n="portfolio.archHint">Click a node</span>
                   </div>
@@ -490,6 +672,11 @@
               <div class="case-media">
                 <div class="arch-frame">
                   <div class="arch-chrome">
+                    <div class="ide-dots" aria-hidden="true">
+                      <span class="dot red"></span>
+                      <span class="dot yellow"></span>
+                      <span class="dot green"></span>
+                    </div>
                     <span class="arch-title" dir="ltr"><bdi dir="ltr">pipeline · mostaql-bot</bdi></span>
                     <span class="arch-chip" data-i18n="portfolio.archHint">Click a node</span>
                   </div>
@@ -549,6 +736,11 @@
               <div class="case-media">
                 <div class="arch-frame">
                   <div class="arch-chrome">
+                    <div class="ide-dots" aria-hidden="true">
+                      <span class="dot red"></span>
+                      <span class="dot yellow"></span>
+                      <span class="dot green"></span>
+                    </div>
                     <span class="arch-title" dir="ltr"><bdi dir="ltr">containers · cv-app</bdi></span>
                     <span class="arch-chip" data-i18n="portfolio.archHint">Click a node</span>
                   </div>
@@ -616,6 +808,11 @@
               </div>
             </article>
           </div>
+          <nav class="portfolio-pagination mt-12" id="portfolio-pagination" aria-label="Projects pagination" hidden>
+            <button type="button" class="page-btn" data-page-nav="prev" data-i18n="portfolio.prev">Previous</button>
+            <div class="page-numbers" data-page-numbers></div>
+            <button type="button" class="page-btn" data-page-nav="next" data-i18n="portfolio.next">Next</button>
+          </nav>
         </div>
       </section>
 
