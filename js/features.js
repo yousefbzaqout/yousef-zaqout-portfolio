@@ -204,6 +204,46 @@ window.YZFeatures = (function () {
       badges: ["Alerts", "< 5s"],
       why: "Push channel for high-signal opportunities without polling the UI.",
     },
+    "sn-clients": {
+      title: "Actors & Clients",
+      badges: ["RTL", "PIN / Email"],
+      why: "Student app, parent/teacher portals, Filament admin, and public landing hit the same Laravel app.",
+    },
+    "sn-laravel": {
+      title: "Laravel 13 Backend",
+      badges: ["Breeze Session", "Livewire"],
+      why: "routes/web.php serves pages and JSON endpoints; middleware enforces auth, active child, and tenant scope.",
+    },
+    "sn-filament": {
+      title: "Filament Panels",
+      badges: ["/parent", "/admin"],
+      why: "Parent cockpit and admin curriculum/tenant ops (demo requests, interactive lessons, users).",
+    },
+    "lesson-engine": {
+      title: "Interactive Lesson Engine",
+      badges: ["6 Stations", "JSONB"],
+      why: "Station configs drive pedagogy then hand off to quizzes; AdaptiveMasteryEngine injects micro-hints.",
+    },
+    queues: {
+      title: "Redis Queues",
+      badges: ["Jobs", "Digests"],
+      why: "ProcessAnalyticsEventJob, ProcessPDFMaterialJob, activity/recommendation jobs, weekly parent digests.",
+    },
+    "sn-postgres": {
+      title: "PostgreSQL 18 + pgvector",
+      badges: ["OLTP", "Embeddings"],
+      why: "Curriculum, students, lesson_analytics, and MaterialChunk embeddings for PDF retrieval.",
+    },
+    "sn-ai": {
+      title: "OpenRouter via Prism",
+      badges: ["Gen", "Embeddings"],
+      why: "Lesson/activity generation and embeddings for the parent-material RAG pipeline.",
+    },
+    "redis-cache": {
+      title: "Redis Cache / Leaderboards",
+      badges: ["CACHE_STORE", "QUEUE"],
+      why: "Application cache, queue broker, and gamification leaderboard reads.",
+    },
   };
 
   const OPENAPI = {
@@ -385,6 +425,96 @@ window.YZFeatures = (function () {
           summary: "Create resume (Clean Architecture use-case)",
           body: { title: "Backend Engineer", template: "modern" },
           response: { id: 10, status: "draft" },
+        },
+      ],
+    },
+    "sanabel-iq": {
+      title: "Sanabel IQ Web JSON Surfaces",
+      version: "v1",
+      baseUrl: "/",
+      auth: "Session cookie (Laravel Breeze) for student/parent routes; public for /health and POST /demo-requests",
+      paths: [
+        {
+          method: "GET",
+          path: "/health",
+          summary: "Ops readiness probe (DB, Redis, storage free space)",
+          response: {
+            status: "ok",
+            services: { database: "up", redis: "up", storage: "up" },
+          },
+        },
+        {
+          method: "POST",
+          path: "/demo-requests",
+          summary: "Landing CTA: create DemoRequest (throttle 5/min) and notify admins",
+          body: {
+            school_name: "مدرسة الأمل",
+            contact_name: "أحمد محمد",
+            job_title: "مدير المدرسة",
+            phone: "0512345678",
+            email: "admin@school.example",
+            seat_range: "50-100",
+            notes: "نرغب بعرض للمنهج الصف الأول",
+          },
+          response: {
+            message: "تم استلام طلب العرض التجريبي بنجاح. سيتواصل معكم فريق سنابل IQ قريباً.",
+            data: { id: 1 },
+          },
+        },
+        {
+          method: "POST",
+          path: "/student/interactive-lesson/{lessonKey}/analytics",
+          summary: "Queue a lesson telemetry event into ProcessAnalyticsEventJob → lesson_analytics",
+          headers: { Cookie: "laravel_session=…", "X-XSRF-TOKEN": "…" },
+          body: {
+            event_type: "station_complete",
+            concept_key: "letter_raa",
+            station: 3,
+            error_count: 0,
+            payload: { time_spent: 42 },
+          },
+          response: {
+            queued: true,
+            lesson_key: "ar-g1-letter-raa",
+            event_type: "station_complete",
+            station: 3,
+          },
+        },
+        {
+          method: "POST",
+          path: "/student/ai/pronunciation",
+          summary: "Score Arabic pronunciation attempt for a lesson target (active student + throttle)",
+          headers: { Cookie: "laravel_session=…", "X-XSRF-TOKEN": "…" },
+          body: {
+            target: "رَ",
+            transcript: "را",
+            lesson_key: "ar-g1-letter-raa",
+          },
+          response: {
+            result: "match",
+            score: 85,
+            feedback: "ممتاز! نطقك واضح",
+          },
+        },
+        {
+          method: "GET",
+          path: "/parent/mastery-analytics/{student}/data",
+          summary: "JSON mastery aggregate from lesson_analytics for an owned child",
+          headers: { Cookie: "laravel_session=…", Accept: "application/json" },
+          response: {
+            student_id: 1,
+            overview: {
+              completion_rate: 75,
+              average_mastery_score: 82,
+              total_time_spent_seconds: 1200,
+              lessons_touched: 4,
+              lessons_completed: 3,
+            },
+            time_by_lesson: { "ar-g1-letter-raa": 400 },
+            time_by_station: { "3": 120 },
+            stations: { voice: {}, tracing: {}, quiz_discovery: {} },
+            ai_interventions: { total_hints: 2, by_concept: { diacritic_confusion: 2 } },
+          },
         },
       ],
     },
@@ -799,14 +929,97 @@ window.YZFeatures = (function () {
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
+  async function downloadFile(href, filename, eventName, extra = {}) {
+    try {
+      const res = await fetch(`${href}?v=20260924`);
+      if (!res.ok) throw new Error(`fetch ${res.status}`);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.rel = "noopener";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch {
+      const a = document.createElement("a");
+      a.href = href;
+      a.download = filename;
+      a.rel = "noopener";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+    window.YZAnalytics?.track(eventName, {
+      lang: document.documentElement.lang || "en",
+      ...extra,
+    });
+  }
+
   function downloadCv() {
-    const a = document.createElement("a");
-    a.href = "./assets/Yousef_Zaqout_CV.pdf";
-    a.download = "Yousef_Zaqout_CV.pdf";
-    a.rel = "noopener";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
+    return downloadFile(
+      "./assets/Yousef_Zaqout_CV.pdf",
+      "Yousef_Zaqout_CV.pdf",
+      "cv_download",
+      { variant: "branded" }
+    );
+  }
+
+  function downloadCvAts() {
+    return downloadFile(
+      "./assets/Yousef_Zaqout_CV_ATS.pdf",
+      "Yousef_Zaqout_CV_ATS.pdf",
+      "cv_download",
+      { variant: "ats" }
+    );
+  }
+
+  function openCvSheet() {
+    closePalette();
+    closeContactModal();
+    const sheet = $("#cv-sheet");
+    const backdrop = $("#cv-backdrop");
+    const trigger = $("#cv-open");
+    if (!sheet) return;
+    sheet.classList.add("is-open");
+    backdrop?.classList.add("is-open");
+    sheet.setAttribute("aria-hidden", "false");
+    trigger?.setAttribute("aria-expanded", "true");
+    document.body.classList.add("cv-sheet-open");
+    $("#cv-sheet-close")?.focus();
+  }
+
+  function closeCvSheet() {
+    const sheet = $("#cv-sheet");
+    const backdrop = $("#cv-backdrop");
+    const trigger = $("#cv-open");
+    sheet?.classList.remove("is-open");
+    backdrop?.classList.remove("is-open");
+    sheet?.setAttribute("aria-hidden", "true");
+    trigger?.setAttribute("aria-expanded", "false");
+    document.body.classList.remove("cv-sheet-open");
+  }
+
+  function handleCvDownload(variant) {
+    if (variant === "ats") downloadCvAts();
+    else downloadCv();
+    closeCvSheet();
+  }
+
+  function initCvDownload() {
+    $("#cv-open")?.addEventListener("click", openCvSheet);
+    $("#cv-sheet-close")?.addEventListener("click", closeCvSheet);
+    $("#cv-backdrop")?.addEventListener("click", closeCvSheet);
+    $$("[data-cv-download]").forEach((btn) => {
+      btn.addEventListener("click", () => handleCvDownload(btn.dataset.cvDownload));
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && $("#cv-sheet")?.classList.contains("is-open")) {
+        closeCvSheet();
+      }
+    });
   }
 
   const COMMANDS = [
@@ -842,10 +1055,20 @@ window.YZFeatures = (function () {
     {
       id: "cv",
       label: "download-cv",
-      hint: "Download CV (PDF)",
+      hint: "Download branded CV (PDF)",
       aliases: ["download-cv", "cv", "resume"],
       run: () => {
         downloadCv();
+        closePalette();
+      },
+    },
+    {
+      id: "cvAts",
+      label: "download-cv-ats",
+      hint: "Download ATS-friendly CV (PDF)",
+      aliases: ["download-cv-ats", "cv-ats", "ats", "resume-ats"],
+      run: () => {
+        downloadCvAts();
         closePalette();
       },
     },
@@ -873,7 +1096,7 @@ window.YZFeatures = (function () {
     const i18n = t();
     const hits = !query || query === "help" ? COMMANDS : matchCommand(query);
     if (!hits.length) {
-      list.innerHTML = `<p class="cmd-empty">No commands match <bdi dir="ltr">${escapeHtml(query)}</bdi></p>`;
+      list.innerHTML = `<p class="cmd-empty">${escapeHtml(i18n.cmd?.empty || "No commands match")} <bdi dir="ltr">${escapeHtml(query)}</bdi></p>`;
       return;
     }
     list.innerHTML = hits
@@ -1044,9 +1267,9 @@ window.YZFeatures = (function () {
         numbersEl.innerHTML = Array.from({ length: totalPages }, (_, idx) => {
           const n = idx + 1;
           const active = n === currentPage ? " is-active" : "";
-          return `<button type="button" class="page-num${active}" data-page="${n}" aria-label="Page ${n}" aria-current="${
-            n === currentPage ? "page" : "false"
-          }">${n}</button>`;
+          return `<button type="button" class="page-num${active}" data-page="${n}" aria-label="Page ${n}"${
+            n === currentPage ? ' aria-current="page"' : ""
+          }>${n}</button>`;
         }).join("");
       }
 
@@ -1111,7 +1334,17 @@ window.YZFeatures = (function () {
     initAudioToggle();
     initRigor();
     initPortfolioPagination();
+    initCvDownload();
   }
 
-  return { init, openPalette, openDrawer, openContactModal, closeDrawer, closePalette };
+  return {
+    init,
+    openPalette,
+    openDrawer,
+    openContactModal,
+    closeDrawer,
+    closePalette,
+    closeCvSheet,
+    refreshCmd: renderCmdResults,
+  };
 })();

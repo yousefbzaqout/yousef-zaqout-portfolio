@@ -21,6 +21,7 @@ ok("no absolute /assets root paths in src", !/src="\/assets\//.test(html));
 ok("no leftover VITE placeholders", !/%VITE_/.test(html));
 ok("og-preview file", fs.existsSync(path.join(dist, "assets", "og-preview.png")));
 ok("cv pdf", fs.existsSync(path.join(dist, "assets", "Yousef_Zaqout_CV.pdf")));
+ok("cv ats pdf", fs.existsSync(path.join(dist, "assets", "Yousef_Zaqout_CV_ATS.pdf")));
 ok("favicon.ico public", fs.existsSync(path.join(dist, "favicon.ico")));
 ok(
   "js bundle",
@@ -61,6 +62,7 @@ ok("projects anchor", /id="projects"/.test(html) && /id="tech-stack"/.test(html)
 
 const feat = fs.readFileSync("js/features.js", "utf8");
 ok("cv relative path", feat.includes("./assets/Yousef_Zaqout_CV.pdf"));
+ok("cv ats relative path", feat.includes("./assets/Yousef_Zaqout_CV_ATS.pdf"));
 ok("help command renders", feat.includes('renderCmdResults("help")'));
 ok("openapi bdi", feat.includes('<bdi dir="ltr">') && feat.includes("oa-method"));
 ok("pagination 3 per page", feat.includes("ITEMS_PER_PAGE = 3") && feat.includes("initPortfolioPagination"));

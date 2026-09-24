@@ -4,7 +4,8 @@ import "./features.js";
 
 (function () {
   const I18N = window.I18N;
-  const STORAGE_KEY = "yz-lang";
+  const LANG_KEY = "yz-lang";
+  const THEME_KEY = "yz-theme";
   const root = document.documentElement;
   const CODE_PLAIN = `// Cached · Indexed · Documented
 Route::middleware(['auth:sanctum'])
@@ -32,7 +33,7 @@ return cache()->remember('metrics', 60, fn () =>
   function isolateTechHtml(str) {
     const escaped = escapeHtml(str);
     return escaped.replace(
-      /(?:&lt;\s*)?\d+(?:\.\d+)?(?:\s*(?:ms|s|MB|%))?|%|\b(?:N\+1|REST(?:ful)?|API(?:s)?|RAG|LLM|RBAC|SOLID|HMAC|SLA|OpenAPI|Swagger|Postman|PostgreSQL|Postgres|pgvector|Redis|Docker|Laravel(?:\s+\d+)?|Filament(?:\s+v?\d+)?|Horizon|OpenRouter|Stripe|Moyasar|Tap|OpenAI|Vue(?:\s*\d+)?|PHP|GitHub|Sanctum|JSON|JSONB|cURL|Telegram|TikTok|Snapchat|LinkedIn|Google\s+Ads|Meta|n8n|FirstTouch|OWASP(?:\s+ZAP)?|Dusk|k6|ROAS|SaaS|CI\/CD|AdPilot|Scrum(?:\s+Master)?|Areisto|Clean\s+Architecture|Composition\s+API|Backend)(?:\/[A-Za-z]+)?\b|[A-Za-z][\w]*(?:\/[\w.]+)+(?:\.php)?|[A-Za-z]\w*::\w+|\/v\d+\/[\w\-\/]+|"cached"\s*:\s*true|200\s+OK|routes\/api\.php/gi,
+      /(?:&lt;\s*)?\d+(?:\.\d+)?(?:\s*(?:ms|s|MB|%))?|%|\b(?:N\+1|REST(?:ful)?|API(?:s)?|RAG|LLM|RBAC|SOLID|HMAC|SLA|OpenAPI|Swagger|Postman|PostgreSQL|Postgres|pgvector|Redis|Docker|Laravel(?:\s+\d+)?|Filament(?:\s+v?\d+)?|Horizon|OpenRouter|Prism|Stripe|Moyasar|Tap|OpenAI|Vue(?:\s*\d+)?|PHP|GitHub|Sanctum|JSON|JSONB|cURL|Telegram|TikTok|Snapchat|LinkedIn|Google\s+Ads|Meta|n8n|FirstTouch|Sanabel(?:\s+IQ)?|OWASP(?:\s+ZAP)?|Dusk|k6|ROAS|SaaS|CI\/CD|AdPilot|Scrum(?:\s+Master)?|Areisto|Clean\s+Architecture|Composition\s+API|Backend|B2B|Livewire|PIN)(?:\/[A-Za-z]+)?\b|[A-Za-z][\w]*(?:\/[\w.]+)+(?:\.php)?|[A-Za-z]\w*::\w+|\/v\d+\/[\w\-\/]+|"cached"\s*:\s*true|200\s+OK|routes\/api\.php/gi,
       (match) => `<bdi dir="ltr">${match}</bdi>`
     );
   }
@@ -43,10 +44,64 @@ return cache()->remember('metrics', 60, fn () =>
     else el.textContent = value;
   }
 
+  function detectLang() {
+    const nav = (navigator.languages?.[0] || navigator.language || "en").toLowerCase();
+    return nav.startsWith("ar") ? "ar" : "en";
+  }
+
   function getLang() {
-    const saved = localStorage.getItem(STORAGE_KEY);
+    const saved = localStorage.getItem(LANG_KEY);
     if (saved === "ar" || saved === "en") return saved;
-    return "en";
+    return detectLang();
+  }
+
+  function detectTheme() {
+    return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+  }
+
+  function getThemePref() {
+    const saved = localStorage.getItem(THEME_KEY);
+    if (saved === "light" || saved === "dark" || saved === "system") return saved;
+    return "system";
+  }
+
+  function resolveTheme(pref = getThemePref()) {
+    if (pref === "light" || pref === "dark") return pref;
+    return detectTheme();
+  }
+
+  function updateThemeColor(resolved) {
+    const meta = $("#theme-color-meta");
+    if (meta) meta.setAttribute("content", resolved === "light" ? "#f3f6fb" : "#090d16");
+  }
+
+  function syncThemeButtons(pref, lang) {
+    const t = I18N[lang] || I18N.en;
+    const group = $(".theme-toggle");
+    if (group) group.setAttribute("aria-label", t.theme?.label || "Theme");
+    $$("[data-theme-pref]").forEach((btn) => {
+      const mode = btn.dataset.themePref;
+      const active = mode === pref;
+      btn.classList.toggle("is-active", active);
+      btn.setAttribute("aria-pressed", active ? "true" : "false");
+      const title =
+        mode === "light"
+          ? t.theme?.light || "Light"
+          : mode === "dark"
+            ? t.theme?.dark || "Dark"
+            : t.theme?.system || "System";
+      btn.title = title;
+    });
+  }
+
+  function applyThemePref(pref, { persist = false } = {}) {
+    if (persist) localStorage.setItem(THEME_KEY, pref);
+    const resolved = resolveTheme(pref);
+    root.setAttribute("data-theme-pref", pref);
+    root.setAttribute("data-theme", resolved);
+    root.style.colorScheme = resolved;
+    syncThemeButtons(pref, getLang());
+    updateThemeColor(resolved);
   }
 
   function setLangButtons(lang) {
@@ -68,14 +123,15 @@ return cache()->remember('metrics', 60, fn () =>
     return path.split(".").reduce((o, k) => (o ? o[k] : null), t);
   }
 
-  function render(lang) {
+  function render(lang, { persist = false } = {}) {
     const t = I18N[lang];
     if (!t) return;
 
     root.lang = t.lang;
     root.dir = t.dir;
-    localStorage.setItem(STORAGE_KEY, lang);
+    if (persist) localStorage.setItem(LANG_KEY, lang);
     setLangButtons(lang);
+    syncThemeButtons(getThemePref(), lang);
 
     $$("[data-i18n]").forEach((el) => {
       const value = tPath(t, el.getAttribute("data-i18n"));
@@ -125,6 +181,21 @@ return cache()->remember('metrics', 60, fn () =>
         .map((tag) => `<span class="chip"><bdi dir="ltr">${escapeHtml(tag)}</bdi></span>`)
         .join("");
       setTechText($("h3", card), item.title, lang);
+
+      let proofEl = $(".case-proof", card);
+      if (item.proof?.length) {
+        if (!proofEl) {
+          proofEl = document.createElement("p");
+          proofEl.className = "case-proof";
+          const h3 = $("h3", card);
+          if (h3) h3.insertAdjacentElement("afterend", proofEl);
+        }
+        setTechText(proofEl, item.proof.join(" · "), lang);
+        proofEl.hidden = false;
+      } else if (proofEl) {
+        proofEl.hidden = true;
+        proofEl.textContent = "";
+      }
 
       const steps = t.portfolio.steps;
       const map = {
@@ -200,6 +271,22 @@ return cache()->remember('metrics', 60, fn () =>
       copyLabel.textContent = t.hero.copy;
     }
 
+    const cmdInput = $("#cmd-input");
+    if (cmdInput && t.cmd?.placeholder) {
+      cmdInput.setAttribute("placeholder", t.cmd.placeholder);
+    }
+
+    const cvOpen = $("#cv-open");
+    if (cvOpen && t.cv?.openLabel) {
+      cvOpen.setAttribute("aria-label", t.cv.openLabel);
+      cvOpen.setAttribute("title", t.cv.openLabel);
+    }
+
+    // Refresh open command palette labels after language switch
+    if ($("#cmd-palette")?.classList.contains("is-open") && window.YZFeatures?.refreshCmd) {
+      window.YZFeatures.refreshCmd(cmdInput?.value || "");
+    }
+
     document.title =
       lang === "ar"
         ? "يوسف زقوت | مهندس Backend"
@@ -243,10 +330,25 @@ return cache()->remember('metrics', 60, fn () =>
 
   $$(".lang-toggle button").forEach((btn) => {
     btn.addEventListener("click", () => {
-      render(btn.dataset.lang);
+      render(btn.dataset.lang, { persist: true });
       closeMenu();
     });
   });
+
+  $$("[data-theme-pref]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      applyThemePref(btn.dataset.themePref, { persist: true });
+      window.YZAnalytics?.track("theme_change", { theme: btn.dataset.themePref });
+    });
+  });
+
+  const themeMq = window.matchMedia("(prefers-color-scheme: light)");
+  const onSystemTheme = () => {
+    if (getThemePref() !== "system") return;
+    applyThemePref("system");
+  };
+  if (themeMq.addEventListener) themeMq.addEventListener("change", onSystemTheme);
+  else if (themeMq.addListener) themeMq.addListener(onSystemTheme);
 
   const menuBtn = $(".menu-toggle");
   const navLinks = $(".nav-links");
@@ -307,6 +409,7 @@ return cache()->remember('metrics', 60, fn () =>
     pill.addEventListener("click", () => pill.classList.toggle("is-active"));
   });
 
+  applyThemePref(getThemePref());
   render(getLang());
   if (window.YZFeatures) window.YZFeatures.init();
 })();
