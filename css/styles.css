@@ -586,9 +586,9 @@ main {
 .hero-title {
   font-size: clamp(2.5rem, 5.5vw, 3.75rem);
   font-weight: 800;
-  line-height: 1.08;
+  line-height: 1.12;
   letter-spacing: -0.04em;
-  margin-bottom: 1rem;
+  margin-bottom: 1.35rem;
   max-width: 14ch;
   background: linear-gradient(180deg, var(--hero-title-from) 15%, var(--hero-title-to) 100%);
   -webkit-background-clip: text;
@@ -598,14 +598,24 @@ main {
 
 [dir="rtl"] .hero-title {
   max-width: 16ch;
+  line-height: 1.28;
+  letter-spacing: 0;
+  margin-bottom: 1.55rem;
 }
 
 .hero-lead {
   color: var(--text-muted);
   font-size: 1.0625rem;
-  max-width: 32rem;
-  margin-bottom: 1.6rem;
-  line-height: 1.65;
+  max-width: 34rem;
+  margin-bottom: 1.75rem;
+  line-height: 1.75;
+}
+
+[dir="rtl"] .hero-lead {
+  font-size: 1.1rem;
+  line-height: 1.9;
+  margin-bottom: 1.9rem;
+  letter-spacing: 0.01em;
 }
 
 .hero-ctas {
@@ -1924,7 +1934,57 @@ bdi,
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.75rem;
-  margin-bottom: 1.6rem;
+  margin-bottom: 1.35rem;
+}
+
+.contact-secondary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.15rem;
+}
+
+.cv-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.cv-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 2.35rem;
+  padding: 0.45rem 0.95rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+
+.cv-chip:hover,
+.cv-chip:focus-visible {
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  background: var(--accent-soft);
+}
+
+.cv-chip svg {
+  flex-shrink: 0;
+  color: var(--accent);
+}
+
+.cv-chip-quiet {
+  color: var(--text-dim);
+  background: transparent;
 }
 
 .contact-social {
@@ -1947,39 +2007,6 @@ bdi,
 .contact-social a:hover {
   color: var(--accent);
   transform: translateY(-1px);
-}
-
-.cv-inline-links {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.45rem 0.65rem;
-  margin-top: 1.15rem;
-}
-
-.cv-inline-link {
-  background: none;
-  border: none;
-  padding: 0;
-  font: inherit;
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-decoration: underline;
-  text-decoration-color: color-mix(in srgb, var(--accent) 45%, transparent);
-  text-underline-offset: 0.2em;
-  cursor: pointer;
-  transition: color 0.2s;
-}
-
-.cv-inline-link:hover,
-.cv-inline-link:focus-visible {
-  color: var(--accent);
-}
-
-.cv-inline-sep {
-  color: var(--text-dim);
-  font-size: 0.85rem;
 }
 
 .cv-download-btn {
@@ -3144,8 +3171,17 @@ body.drawer-open {
     word-break: break-word;
   }
 
+  [dir="rtl"] .hero-title {
+    margin-bottom: 1.35rem;
+  }
+
   .hero-lead {
     font-size: 0.95rem;
+  }
+
+  [dir="rtl"] .hero-lead {
+    font-size: 1rem;
+    line-height: 1.85;
   }
 
   .tech-logos {
