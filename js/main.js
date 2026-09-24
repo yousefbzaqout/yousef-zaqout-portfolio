@@ -282,6 +282,11 @@ return cache()->remember('metrics', 60, fn () =>
       cvOpen.setAttribute("title", t.cv.openLabel);
     }
 
+    $$("[data-i18n-aria]").forEach((el) => {
+      const value = tPath(t, el.getAttribute("data-i18n-aria"));
+      if (typeof value === "string") el.setAttribute("aria-label", value);
+    });
+
     // Refresh open command palette labels after language switch
     if ($("#cmd-palette")?.classList.contains("is-open") && window.YZFeatures?.refreshCmd) {
       window.YZFeatures.refreshCmd(cmdInput?.value || "");
