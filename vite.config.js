@@ -17,6 +17,9 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
   const siteUrl = (env.VITE_SITE_URL || "http://localhost:5173").replace(/\/$/, "");
   const ogImage = env.VITE_OG_IMAGE || `${siteUrl}/assets/og-preview.png`;
+  const ga4Id = env.VITE_GA4_ID || "";
+  const posthogKey = env.VITE_POSTHOG_KEY || "";
+  const posthogHost = (env.VITE_POSTHOG_HOST || "https://us.i.posthog.com").replace(/\/$/, "");
 
   return {
     root: ".",
@@ -46,6 +49,9 @@ export default defineConfig(({ mode }) => {
           return html
             .replaceAll("%VITE_SITE_URL%", siteUrl)
             .replaceAll("%VITE_OG_IMAGE%", ogImage)
+            .replaceAll("%VITE_GA4_ID%", ga4Id)
+            .replaceAll("%VITE_POSTHOG_KEY%", posthogKey)
+            .replaceAll("%VITE_POSTHOG_HOST%", posthogHost)
             .replaceAll("https://yourdomain.com", siteUrl);
         },
       },

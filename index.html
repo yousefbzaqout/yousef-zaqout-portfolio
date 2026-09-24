@@ -43,12 +43,40 @@
     <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon-32.png" />
     <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png" />
 
-    <!-- Analytics: set keys before analytics.js loads (leave empty to no-op / console.debug) -->
+    <!-- Apply lang/theme before paint — device defaults unless user saved a choice -->
+    <script>
+      (function () {
+        try {
+          var root = document.documentElement;
+          var lang = localStorage.getItem("yz-lang");
+          if (lang !== "ar" && lang !== "en") {
+            var nav = ((navigator.languages && navigator.languages[0]) || navigator.language || "en").toLowerCase();
+            lang = nav.indexOf("ar") === 0 ? "ar" : "en";
+          }
+          var pref = localStorage.getItem("yz-theme");
+          if (pref !== "light" && pref !== "dark" && pref !== "system") pref = "system";
+          var theme =
+            pref === "system"
+              ? window.matchMedia("(prefers-color-scheme: light)").matches
+                ? "light"
+                : "dark"
+              : pref;
+          root.lang = lang;
+          root.dir = lang === "ar" ? "rtl" : "ltr";
+          root.setAttribute("data-theme-pref", pref);
+          root.setAttribute("data-theme", theme);
+          root.style.colorScheme = theme;
+        } catch (e) {}
+      })();
+    </script>
+    <meta name="theme-color" id="theme-color-meta" content="#090d16" />
+
+    <!-- Analytics: keys injected at build from .env* (leave empty to no-op) -->
     <script>
       window.YZ_ANALYTICS = {
-        ga4Id: "", // e.g. "G-XXXXXXXXXX"
-        posthogKey: "", // e.g. "phc_xxxxxxxx"
-        posthogHost: "https://us.i.posthog.com",
+        ga4Id: "%VITE_GA4_ID%",
+        posthogKey: "%VITE_POSTHOG_KEY%",
+        posthogHost: "%VITE_POSTHOG_HOST%",
         debug: false,
       };
     </script>
@@ -104,12 +132,51 @@
             </svg>
             <kbd class="hotkey-badge" id="cmd-hotkey" dir="ltr">Ctrl+K</kbd>
           </button>
+          <button
+            type="button"
+            class="icon-btn cv-download-btn"
+            id="cv-open"
+            aria-haspopup="dialog"
+            aria-controls="cv-sheet"
+            aria-expanded="false"
+            data-i18n-aria="cv.openLabel"
+            aria-label="Download CV"
+            title="Download CV"
+          >
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+              <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5z" />
+              <path d="M14 3v5h5" />
+              <path d="M12 11v6M9.5 14.5L12 17l2.5-2.5" />
+            </svg>
+          </button>
           <button type="button" class="icon-btn" id="audio-toggle" aria-label="Toggle keypress sound" aria-pressed="true">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
               <path d="M11 5L6 9H3v6h3l5 4V5z" />
               <path class="audio-wave" d="M15 9a4 4 0 010 6M18 7a7 7 0 010 10" />
             </svg>
           </button>
+          <div class="theme-toggle" role="group" aria-label="Theme">
+            <button type="button" data-theme-pref="light" aria-pressed="false" title="Light">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                <circle cx="12" cy="12" r="4" />
+                <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+              </svg>
+              <span class="sr-only" data-i18n="theme.light">Light</span>
+            </button>
+            <button type="button" data-theme-pref="dark" aria-pressed="false" title="Dark">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                <path d="M21 14.3A8.5 8.5 0 1110.7 3a7 7 0 0010.3 11.3z" />
+              </svg>
+              <span class="sr-only" data-i18n="theme.dark">Dark</span>
+            </button>
+            <button type="button" data-theme-pref="system" aria-pressed="true" title="System" class="is-active">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                <rect x="3" y="4" width="18" height="12" rx="2" />
+                <path d="M8 20h8M12 16v4" />
+              </svg>
+              <span class="sr-only" data-i18n="theme.system">System</span>
+            </button>
+          </div>
           <div class="lang-toggle" role="group" aria-label="Language">
             <button type="button" data-lang="en" class="is-active" aria-pressed="true">EN</button>
             <button type="button" data-lang="ar" aria-pressed="false">عر</button>
@@ -307,8 +374,8 @@
             <span data-i18n-tech="proof.p3Text">Real-time Telegram Alerts — automated scraping pipelines</span>
           </article>
           <article class="metric-card reveal reveal-delay-3">
-            <strong><bdi dir="ltr" data-i18n="proof.p4Title">100%</bdi></strong>
-            <span data-i18n-tech="proof.p4Text">Production-Ready API Docs — Postman &amp; Swagger/OpenAPI</span>
+            <strong><bdi dir="ltr" data-i18n="proof.p4Title">6</bdi></strong>
+            <span data-i18n-tech="proof.p4Text">Production case studies — newest first, architecture + OpenAPI</span>
           </article>
         </div>
       </section>
@@ -421,8 +488,93 @@
             <p data-i18n="portfolio.lead">Click architecture nodes to inspect decisions. Inspect OpenAPI without leaving the page.</p>
           </div>
           <div class="portfolio-list">
+            <!-- Sanabel IQ -->
+            <article class="case-card reveal" data-case data-project="sanabel-iq">
+              <div class="case-media">
+                <div class="arch-frame">
+                  <div class="arch-chrome">
+                    <div class="ide-dots" aria-hidden="true">
+                      <span class="dot red"></span>
+                      <span class="dot yellow"></span>
+                      <span class="dot green"></span>
+                    </div>
+                    <span class="arch-title" dir="ltr"><bdi dir="ltr">engine · sanabel-iq</bdi></span>
+                    <span class="arch-chip" data-i18n="portfolio.archHint">Click a node</span>
+                  </div>
+                  <div class="arch-canvas ratio-16x9" data-arch-diagram>
+                    <svg viewBox="0 0 640 360" class="arch-svg" role="img" aria-label="Sanabel IQ architecture">
+                      <rect width="640" height="360" fill="#0c1220" />
+                      <path class="arch-edge" data-edge="sn-clients sn-laravel" d="M130 90 H190" stroke="#334155" stroke-width="2" />
+                      <path class="arch-edge" data-edge="sn-laravel lesson-engine" d="M340 90 H400" stroke="#334155" stroke-width="2" />
+                      <path class="arch-edge" data-edge="sn-laravel sn-filament" d="M265 130 V175" stroke="#334155" stroke-width="2" />
+                      <path class="arch-edge" data-edge="lesson-engine queues" d="M540 120 V165" stroke="#334155" stroke-width="2" />
+                      <path class="arch-edge" data-edge="queues sn-postgres" d="M470 220 H520" stroke="#334155" stroke-width="2" />
+                      <path class="arch-edge" data-edge="queues sn-ai" d="M340 220 H280" stroke="#334155" stroke-width="2" />
+                      <path class="arch-edge" data-edge="queues redis-cache" d="M405 250 V285" stroke="#334155" stroke-width="2" />
+                      <g class="arch-node" data-node="sn-clients">
+                        <rect x="30" y="55" width="100" height="70" rx="10" fill="#111726" stroke="rgba(255,255,255,.15)" />
+                        <text x="80" y="85" text-anchor="middle" fill="#e2e8f0" font-size="11" font-family="system-ui" font-weight="600">Actors</text>
+                        <text x="80" y="105" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="system-ui">PIN · Email</text>
+                      </g>
+                      <g class="arch-node" data-node="sn-laravel">
+                        <rect x="190" y="50" width="150" height="80" rx="10" fill="rgba(16,185,129,.12)" stroke="#10b981" />
+                        <text x="265" y="82" text-anchor="middle" fill="#e2e8f0" font-size="12" font-family="system-ui" font-weight="600">Laravel 13</text>
+                        <text x="265" y="102" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="system-ui">Breeze · Livewire</text>
+                      </g>
+                      <g class="arch-node" data-node="lesson-engine">
+                        <rect x="400" y="50" width="180" height="80" rx="10" fill="#111726" stroke="rgba(6,182,212,.45)" />
+                        <text x="490" y="82" text-anchor="middle" fill="#e2e8f0" font-size="12" font-family="system-ui" font-weight="600">Lesson Engine</text>
+                        <text x="490" y="102" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="system-ui">6 Stations · JSONB</text>
+                      </g>
+                      <g class="arch-node" data-node="sn-filament">
+                        <rect x="200" y="175" width="130" height="54" rx="10" fill="#111726" stroke="rgba(168,85,247,.45)" />
+                        <text x="265" y="207" text-anchor="middle" fill="#e2e8f0" font-size="11" font-family="system-ui">Filament</text>
+                      </g>
+                      <g class="arch-node" data-node="queues">
+                        <rect x="340" y="175" width="130" height="54" rx="10" fill="#111726" stroke="rgba(220,56,45,.45)" />
+                        <text x="405" y="207" text-anchor="middle" fill="#e2e8f0" font-size="11" font-family="system-ui">Redis Queues</text>
+                      </g>
+                      <g class="arch-node" data-node="sn-ai">
+                        <rect x="160" y="250" width="120" height="48" rx="10" fill="#111726" stroke="rgba(16,163,127,.5)" />
+                        <text x="220" y="280" text-anchor="middle" fill="#e2e8f0" font-size="11" font-family="system-ui">OpenRouter</text>
+                      </g>
+                      <g class="arch-node" data-node="redis-cache">
+                        <rect x="340" y="285" width="130" height="40" rx="8" fill="#111726" stroke="rgba(220,56,45,.35)" />
+                        <text x="405" y="310" text-anchor="middle" fill="#e2e8f0" font-size="10" font-family="system-ui">Cache · Boards</text>
+                      </g>
+                      <g class="arch-node" data-node="sn-postgres">
+                        <rect x="520" y="175" width="100" height="54" rx="10" fill="#111726" stroke="rgba(65,105,225,.5)" />
+                        <text x="570" y="200" text-anchor="middle" fill="#e2e8f0" font-size="11" font-family="system-ui">PG 18</text>
+                        <text x="570" y="216" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="system-ui">pgvector</text>
+                      </g>
+                    </svg>
+                    <div class="arch-popover" hidden>
+                      <strong class="arch-pop-title"></strong>
+                      <div class="arch-pop-badges"></div>
+                      <p class="arch-pop-why"></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="case-body">
+                <div class="case-tags"></div>
+                <h3></h3>
+                <div class="casr-grid">
+                  <article class="casr-card" data-casr="challenge"><span class="casr-label"></span><p></p></article>
+                  <article class="casr-card" data-casr="role"><span class="casr-label"></span><p></p></article>
+                  <article class="casr-card" data-casr="solution"><span class="casr-label"></span><p></p></article>
+                  <article class="casr-card" data-casr="outcome"><span class="casr-label"></span><p></p></article>
+                </div>
+                <div class="case-actions">
+                  <a class="case-link" href="#" target="_blank" rel="noopener noreferrer"></a>
+                  <button type="button" class="btn btn-glass btn-sm" data-openapi="sanabel-iq" data-i18n="portfolio.openapi">
+                    Interactive API Spec
+                  </button>
+                </div>
+              </div>
+            </article>
             <!-- FirstTouch SLA -->
-            <article class="case-card reveal" data-case data-project="firsttouch-sla">
+            <article class="case-card reverse reveal" data-case data-project="firsttouch-sla">
               <div class="case-media">
                 <div class="arch-frame">
                   <div class="arch-chrome">
@@ -505,7 +657,7 @@
             </article>
 
             <!-- AdPilot -->
-            <article class="case-card reverse reveal" data-case data-project="ad-pilot">
+            <article class="case-card reveal" data-case data-project="ad-pilot">
               <div class="case-media">
                 <div class="arch-frame">
                   <div class="arch-chrome">
@@ -599,7 +751,7 @@
             </article>
 
             <!-- Irada -->
-            <article class="case-card reveal" data-case data-project="irada">
+            <article class="case-card reverse reveal" data-case data-project="irada">
               <div class="case-media">
                 <div class="arch-frame">
                   <div class="arch-chrome">
@@ -668,7 +820,7 @@
             </article>
 
             <!-- Mostaql -->
-            <article class="case-card reverse reveal" data-case data-project="mostaql">
+            <article class="case-card reveal" data-case data-project="mostaql">
               <div class="case-media">
                 <div class="arch-frame">
                   <div class="arch-chrome">
@@ -732,7 +884,7 @@
             </article>
 
             <!-- CV App -->
-            <article class="case-card reveal" data-case data-project="cv">
+            <article class="case-card reverse reveal" data-case data-project="cv">
               <div class="case-media">
                 <div class="arch-frame">
                   <div class="arch-chrome">
@@ -807,6 +959,7 @@
                 </div>
               </div>
             </article>
+
           </div>
           <nav class="portfolio-pagination mt-12" id="portfolio-pagination" aria-label="Projects pagination" hidden>
             <button type="button" class="page-btn" data-page-nav="prev" data-i18n="portfolio.prev">Previous</button>
@@ -1078,6 +1231,15 @@
                 >Email</a
               >
             </div>
+            <p class="cv-inline-links">
+              <button type="button" class="cv-inline-link" data-cv-download="branded" data-i18n="cv.contactBranded">
+                Download CV
+              </button>
+              <span class="cv-inline-sep" aria-hidden="true">·</span>
+              <button type="button" class="cv-inline-link" data-cv-download="ats" data-i18n="cv.contactAts">
+                ATS version
+              </button>
+            </p>
             <div class="contact-social">
               <a href="https://github.com/yousefbzaqout" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
@@ -1141,7 +1303,7 @@
           <kbd class="cmd-esc-hint">esc</kbd>
         </div>
         <div class="cmd-results" id="cmd-results"></div>
-        <p class="cmd-hint" data-i18n="cmd.hint">help · skills · projects · curl /contact · download-cv</p>
+        <p class="cmd-hint" data-i18n="cmd.hint">help · skills · projects · curl /contact · download-cv · download-cv-ats</p>
       </div>
     </div>
 
@@ -1183,6 +1345,44 @@
         >
       </div>
     </div>
+
+    <!-- CV download sheet (mobile-first choice) -->
+    <div class="overlay-backdrop" id="cv-backdrop"></div>
+    <div
+      class="cv-sheet"
+      id="cv-sheet"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+      aria-labelledby="cv-sheet-title"
+    >
+      <div class="cv-sheet-handle" aria-hidden="true"></div>
+      <h3 id="cv-sheet-title" data-i18n="cv.sheetTitle">Download CV</h3>
+      <p class="cv-sheet-lead" data-i18n="cv.sheetLead">Choose the version that fits your use.</p>
+      <div class="cv-sheet-actions">
+        <button type="button" class="cv-sheet-option" data-cv-download="branded">
+          <span class="cv-sheet-option-label" data-i18n="cv.branded">Branded CV</span>
+          <span class="cv-sheet-option-hint" data-i18n="cv.brandedHint">Designed for clients</span>
+        </button>
+        <button type="button" class="cv-sheet-option" data-cv-download="ats">
+          <span class="cv-sheet-option-label" data-i18n="cv.ats">ATS CV</span>
+          <span class="cv-sheet-option-hint" data-i18n="cv.atsHint">Plain text for job systems</span>
+        </button>
+      </div>
+      <button type="button" class="cv-sheet-cancel" id="cv-sheet-close" data-i18n="cv.cancel">Cancel</button>
+    </div>
+
+    <!-- Mobile sticky WhatsApp CTA -->
+    <a
+      class="mobile-wa-cta"
+      href="https://wa.me/972594803033"
+      target="_blank"
+      rel="noopener noreferrer"
+      data-track="cta_whatsapp"
+      data-track-location="mobile_sticky"
+      data-i18n="mobile.wa"
+      >WhatsApp · Book a Call</a
+    >
 
     <script type="module" src="./js/main.js"></script>
   </body>

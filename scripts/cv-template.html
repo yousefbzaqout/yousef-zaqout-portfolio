@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Yousef Zaqout — CV</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy: #090d16;
+      --navy-soft: #111827;
+      --emerald: #10b981;
+      --emerald-dim: #059669;
+      --cyan: #22d3ee;
+      --body-bg: #f8fafc;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    @page {
+      size: A4;
+      margin: 14mm;
+    }
+
+    html, body {
+      font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+      font-size: 9.25pt;
+      line-height: 1.45;
+      color: var(--text);
+      background: var(--body-bg);
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .page {
+      max-width: 210mm;
+      margin: 0 auto;
+      background: var(--body-bg);
+    }
+
+    /* Header band */
+    .header {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-soft) 100%);
+      color: #f1f5f9;
+      padding: 10mm 12mm 8mm;
+      position: relative;
+      border-bottom: 3px solid var(--emerald);
+    }
+
+    .header::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -3px;
+      width: 28%;
+      height: 3px;
+      background: var(--cyan);
+      opacity: 0.85;
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      gap: 10mm;
+    }
+
+    .photo {
+      width: 22mm;
+      height: 22mm;
+      border-radius: 4px;
+      object-fit: cover;
+      border: 2px solid rgba(16, 185, 129, 0.55);
+      flex-shrink: 0;
+    }
+
+    .header-text h1 {
+      font-size: 20pt;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #fff;
+      margin-bottom: 2mm;
+    }
+
+    .role {
+      font-size: 10.5pt;
+      font-weight: 600;
+      color: var(--emerald);
+      margin-bottom: 3mm;
+    }
+
+    .contact {
+      font-size: 8pt;
+      color: #94a3b8;
+      line-height: 1.55;
+    }
+
+    .contact a {
+      color: #cbd5e1;
+      text-decoration: none;
+    }
+
+    .main {
+      padding: 7mm 12mm 10mm;
+    }
+
+    section {
+      margin-bottom: 5mm;
+    }
+
+    section:last-child {
+      margin-bottom: 0;
+    }
+
+    h2 {
+      font-size: 9.5pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--navy);
+      margin-bottom: 2.5mm;
+      padding-left: 3mm;
+      border-left: 3px solid var(--emerald);
+    }
+
+    .summary {
+      color: var(--text);
+      font-size: 9pt;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2mm;
+    }
+
+    .chip {
+      background: #fff;
+      border: 1px solid var(--border);
+      color: var(--navy-soft);
+      padding: 1.2mm 3mm;
+      border-radius: 999px;
+      font-size: 7.75pt;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .chip strong {
+      color: var(--emerald-dim);
+      font-weight: 600;
+    }
+
+    ul.work-list,
+    ul.cred-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    ul.work-list li {
+      position: relative;
+      padding-left: 4mm;
+      margin-bottom: 1.8mm;
+      font-size: 8.75pt;
+    }
+
+    ul.work-list li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.55em;
+      width: 1.5mm;
+      height: 1.5mm;
+      background: var(--emerald);
+      border-radius: 50%;
+    }
+
+    ul.cred-list li {
+      padding-left: 4mm;
+      margin-bottom: 1.5mm;
+      font-size: 8.75pt;
+      position: relative;
+    }
+
+    ul.cred-list li::before {
+      content: "—";
+      position: absolute;
+      left: 0;
+      color: var(--emerald);
+      font-weight: 700;
+    }
+
+    .services {
+      font-size: 8.75pt;
+      color: var(--text);
+      padding: 3mm 4mm;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      border-left: 3px solid var(--emerald);
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5mm;
+    }
+
+    @media print {
+      body { background: var(--body-bg); }
+      .page { box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="header">
+      <div class="header-inner">
+        <img
+          class="photo"
+          src="../assets/images/yousef-zaqout.png"
+          alt="Yousef Zaqout"
+          width="84"
+          height="84"
+        />
+        <div class="header-text">
+          <h1>Yousef Zaqout</h1>
+          <p class="role">Backend Engineer · REST API Specialist</p>
+          <p class="contact">
+            <a href="mailto:zaqoutyousef@gmail.com">zaqoutyousef@gmail.com</a>
+            · +972 594 803 033
+            · <a href="https://linkedin.com/in/yousefzaqout">linkedin.com/in/yousefzaqout</a>
+            · <a href="https://github.com/yousefbzaqout">github.com/yousefbzaqout</a>
+          </p>
+        </div>
+      </div>
+    </header>
+
+    <main class="main">
+      <section>
+        <h2>Summary</h2>
+        <p class="summary">
+          Backend engineer specializing in PHP/Laravel, high-performance RESTful APIs, PostgreSQL &amp; Redis, and Docker.
+          Builds payment gateways, AI/RAG pipelines, and production-minded systems for startups.
+        </p>
+      </section>
+
+      <section>
+        <h2>Core Stack</h2>
+        <div class="chips">
+          <span class="chip">Laravel</span>
+          <span class="chip">PostgreSQL</span>
+          <span class="chip">Redis</span>
+          <span class="chip">Docker</span>
+          <span class="chip">OpenAPI</span>
+          <span class="chip">Postman</span>
+          <span class="chip">OpenAI / RAG</span>
+          <span class="chip">Stripe / Moyasar / Tap</span>
+          <span class="chip">Filament</span>
+          <span class="chip">Clean Architecture</span>
+        </div>
+      </section>
+
+      <div class="two-col">
+        <section>
+          <h2>Selected Work</h2>
+          <ul class="work-list">
+            <li><strong>Sanabel IQ</strong> — Adaptive Arabic learning platform (Laravel, PostgreSQL, Redis, Filament, AI/RAG, multi-tenant)</li>
+            <li><strong>FirstTouch SLA</strong> — Lead routing &amp; SLA alerts (Laravel 13, Filament, pgvector, AI, Telegram/n8n)</li>
+            <li><strong>AdPilot</strong> — Ads &amp; content SaaS (Laravel, Filament, AI/LLM, Docker)</li>
+            <li><strong>Irada Academy</strong> — EdTech REST backend (Laravel, RBAC)</li>
+            <li><strong>Freelance job alert bot</strong> — Telegram alerts under 5s</li>
+            <li><strong>CV App</strong> — Laravel 12 API + Vue 3 + Docker</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Experience &amp; Credentials</h2>
+          <ul class="cred-list">
+            <li>B.Sc. Software Engineering — Islamic University of Gaza (IUG)</li>
+            <li>Khareej Qader — Full Stack &amp; Scrum Master at Areisto</li>
+            <li>Gaza Code (Volunteer) — real software projects</li>
+            <li>GitHub: Pair Extraordinaire &amp; Pull Shark</li>
+          </ul>
+
+          <h2 style="margin-top: 5mm;">Services</h2>
+          <p class="services">
+            Custom Laravel backends &amp; REST APIs · Payment &amp; AI integrations ·
+            Performance (PostgreSQL/Redis) &amp; Docker delivery
+          </p>
+        </section>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

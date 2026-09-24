@@ -1,56 +1,51 @@
+"""Regenerate portfolio assets: styled CV PDF + OG preview copies."""
 from pathlib import Path
-
-try:
-    from reportlab.lib.pagesizes import letter
-    from reportlab.pdfgen import canvas
-except ImportError:
-    import subprocess
-    import sys
-
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "reportlab", "-q"])
-    from reportlab.lib.pagesizes import letter
-    from reportlab.pdfgen import canvas
+import shutil
+import subprocess
+import sys
 
 root = Path(__file__).resolve().parent.parent
 assets = root / "assets"
+public_assets = root / "public" / "assets"
 assets.mkdir(exist_ok=True)
-pdf_path = assets / "Yousef_Zaqout_CV.pdf"
+public_assets.mkdir(parents=True, exist_ok=True)
 
-c = canvas.Canvas(str(pdf_path), pagesize=letter)
-w, h = letter
-c.setFont("Helvetica-Bold", 18)
-c.drawString(72, h - 72, "Yousef Zaqout")
-c.setFont("Helvetica", 11)
-c.drawString(72, h - 92, "Backend Engineer & REST API Specialist")
-c.setFont("Helvetica-Bold", 12)
-c.drawString(72, h - 130, "Focus")
-c.setFont("Helvetica", 10)
-y = h - 148
-lines = [
-    "Laravel RESTful APIs · Clean Architecture · Payments · AI/RAG · Docker",
-    "",
-    "Stack",
-    "PHP, Laravel, PostgreSQL, Redis, Docker, OpenAI, Stripe, OpenAPI, Postman",
-    "",
-    "Contact",
-    "Email: zaqoutyousef@gmail.com",
-    "LinkedIn: linkedin.com/in/yousefzaqout",
-    "GitHub: github.com/yousefbzaqout",
-    "WhatsApp: +972 594 803 033",
-]
-for line in lines:
-    if line in ("Stack", "Contact"):
-        c.setFont("Helvetica-Bold", 12)
-        c.drawString(72, y, line)
-        c.setFont("Helvetica", 10)
-    else:
-        c.drawString(72, y, line)
-    y -= 16
-c.showPage()
-c.save()
-print("PDF:", pdf_path)
+# Preferred: Chrome/Chromium print of scripts/cv-template.html
+gen_sh = root / "scripts" / "generate_cv_pdf.sh"
+fallback_py = root / "scripts" / "generate_cv_pdf_fallback.py"
+
+if gen_sh.exists():
+    try:
+        subprocess.check_call(["bash", str(gen_sh)], cwd=str(root))
+    except subprocess.CalledProcessError:
+        print("generate_cv_pdf.sh failed — trying ReportLab fallback", file=sys.stderr)
+        if fallback_py.exists():
+            subprocess.check_call([sys.executable, str(fallback_py)], cwd=str(root))
+elif fallback_py.exists():
+    subprocess.check_call([sys.executable, str(fallback_py)], cwd=str(root))
+else:
+    print("No CV generator found", file=sys.stderr)
+    sys.exit(1)
+
+pdf_src = assets / "Yousef_Zaqout_CV.pdf"
+if pdf_src.exists():
+    shutil.copy2(pdf_src, public_assets / "Yousef_Zaqout_CV.pdf")
+    print("PDF:", pdf_src)
+    print("PDF public:", public_assets / "Yousef_Zaqout_CV.pdf")
+else:
+    print("CV PDF missing after generation", file=sys.stderr)
+    sys.exit(1)
+
+# ATS-friendly plain CV
+ats_py = root / "scripts" / "generate_cv_ats_pdf.py"
+if ats_py.exists():
+    subprocess.check_call([sys.executable, str(ats_py)], cwd=str(root))
+else:
+    print("ATS CV generator missing", file=sys.stderr)
+    sys.exit(1)
 
 src = assets / "images" / "yousef-zaqout.png"
-for dest in (assets / "og-preview.png", root / "og-preview.png"):
-    dest.write_bytes(src.read_bytes())
-    print("OG:", dest)
+if src.exists():
+    for dest in (assets / "og-preview.png", root / "og-preview.png", public_assets / "og-preview.png"):
+        dest.write_bytes(src.read_bytes())
+        print("OG:", dest)

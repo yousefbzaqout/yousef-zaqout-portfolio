@@ -12,15 +12,19 @@
  *   </script>
  */
 window.YZAnalytics = (function () {
-  const CONFIG = Object.assign(
-    {
-      ga4Id: "",
-      posthogKey: "",
-      posthogHost: "https://us.i.posthog.com",
-      debug: false,
-    },
-    window.YZ_ANALYTICS || {}
-  );
+  function cleanEnv(value, fallback = "") {
+    const v = String(value ?? "").trim();
+    if (!v || v.includes("%VITE_")) return fallback;
+    return v;
+  }
+
+  const raw = window.YZ_ANALYTICS || {};
+  const CONFIG = {
+    ga4Id: cleanEnv(raw.ga4Id),
+    posthogKey: cleanEnv(raw.posthogKey),
+    posthogHost: cleanEnv(raw.posthogHost, "https://us.i.posthog.com"),
+    debug: Boolean(raw.debug),
+  };
 
   function log(...args) {
     if (CONFIG.debug || (!CONFIG.ga4Id && !CONFIG.posthogKey)) {
