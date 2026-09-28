@@ -1,0 +1,24 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on Keep a Changelog and this project adheres to semantic versioning principles.
+
+## [1.0.0] - 2026-09-28
+
+### Added
+- professional portfolio landing page and personal branding structure
+- multilingual support with English and Arabic options
+- dark/light theme toggle and system preference handling
+- Open Graph and social metadata configuration
+- Netlify deployment configuration
+- custom domain support via `CNAME`
+- documentation for about, skills, and release notes
+- repository-level quality improvements for professional presentation
+
+### Updated
+- production environment URLs aligned to custom domain ownership
+- README improved for developer onboarding and portfolio presentation
+
+### Notes
+- This release represents the initial professional portfolio version for personal brand and client acquisition.
