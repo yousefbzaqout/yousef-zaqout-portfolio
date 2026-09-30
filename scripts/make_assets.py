@@ -44,8 +44,15 @@ else:
     print("ATS CV generator missing", file=sys.stderr)
     sys.exit(1)
 
-src = assets / "images" / "yousef-zaqout.png"
-if src.exists():
-    for dest in (assets / "og-preview.png", root / "og-preview.png", public_assets / "og-preview.png"):
-        dest.write_bytes(src.read_bytes())
+# Prefer a dedicated 1200×630 OG card at public/og-preview.png (site root — not under /assets cache).
+public_og = root / "public" / "og-preview.png"
+og_src = public_og if public_og.exists() else assets / "og-preview.png"
+if og_src.exists():
+    for dest in (assets / "og-preview.png", public_og, public_assets / "og-preview.png"):
+        if dest.resolve() == og_src.resolve():
+            continue
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_bytes(og_src.read_bytes())
         print("OG:", dest)
+else:
+    print("OG preview missing — place public/og-preview.png (1200×630)", file=sys.stderr)

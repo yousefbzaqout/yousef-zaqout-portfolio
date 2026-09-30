@@ -7,19 +7,19 @@ const checks = [];
 const ok = (name, pass, detail = "") => checks.push({ name, pass: !!pass, detail });
 
 ok("og:type", /property="og:type" content="website"/.test(html));
-ok("og:title", /og:title" content="Yousef Zaqout \| Senior Backend Engineer"/.test(html));
+ok("og:title", /og:title" content="Yousef Zaqout \| Backend Engineer"/.test(html));
 ok("og:description", /og:description"[\s\S]*?Laravel RESTful APIs, payment/.test(html));
 ok(
   "og:image absolute",
-  /og:image" content="https:\/\/yousefbzaqout\.netlify\.app\/assets\/og-preview\.png"/.test(html)
+  /og:image" content="https:\/\/yousefbzaqout\.me\/og-preview\.png"/.test(html)
 );
-ok("og:url", /og:url" content="https:\/\/yousefbzaqout\.netlify\.app\/"/.test(html));
+ok("og:url", /og:url" content="https:\/\/yousefbzaqout\.me\/"/.test(html));
 ok("twitter:card", /twitter:card" content="summary_large_image"/.test(html));
 ok("favicon present", /rel="icon"/.test(html));
 ok("module script", /type="module"/.test(html));
 ok("no absolute /assets root paths in src", !/src="\/assets\//.test(html));
 ok("no leftover VITE placeholders", !/%VITE_/.test(html));
-ok("og-preview file", fs.existsSync(path.join(dist, "assets", "og-preview.png")));
+ok("og-preview file", fs.existsSync(path.join(dist, "og-preview.png")));
 ok("cv pdf", fs.existsSync(path.join(dist, "assets", "Yousef_Zaqout_CV.pdf")));
 ok("cv ats pdf", fs.existsSync(path.join(dist, "assets", "Yousef_Zaqout_CV_ATS.pdf")));
 ok("favicon.ico public", fs.existsSync(path.join(dist, "favicon.ico")));
