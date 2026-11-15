@@ -8,15 +8,15 @@ import "./features.js";
   const THEME_KEY = "yz-theme";
   const root = document.documentElement;
   const CODE_PLAIN = `// Cached · Indexed · Documented
-Route::middleware(['auth:sanctum'])
-  ->get('/v1/metrics', MetricsController::class);
-
-return cache()->remember('metrics', 60, fn () =>
-  Metric::query()->indexed()->get()
-);`;
+Route::middleware('auth:sanctum')->get('/v1/metrics', function () {
+    return cache()->remember('metrics', 60, fn () =>
+        Metric::query()->indexed()->get()
+    );
+});`;
 
   const $ = (sel, el = document) => el.querySelector(sel);
   const $$ = (sel, el = document) => [...el.querySelectorAll(sel)];
+  const WA_PHONE = "972594803033";
 
   function escapeHtml(str) {
     return String(str)
@@ -26,6 +26,18 @@ return cache()->remember('metrics', 60, fn () =>
       .replace(/"/g, "&quot;");
   }
 
+  function waUrl(text) {
+    return `https://wa.me/${WA_PHONE}?text=${encodeURIComponent(text)}`;
+  }
+
+  function syncWhatsAppLinks(lang) {
+    const t = I18N[lang] || I18N.en;
+    const prefill = t.contact?.waPrefill || I18N.en.contact.waPrefill;
+    $$("[data-wa-link]").forEach((el) => {
+      el.setAttribute("href", waUrl(prefill));
+    });
+  }
+
   /**
    * Isolate Latin tech tokens (paths, metrics, product names) inside RTL copy.
    * Keeps digits, %, ms, file paths, and CamelCase identifiers visually LTR.
@@ -33,7 +45,7 @@ return cache()->remember('metrics', 60, fn () =>
   function isolateTechHtml(str) {
     const escaped = escapeHtml(str);
     return escaped.replace(
-      /(?:&lt;\s*)?\d+(?:\.\d+)?(?:\s*(?:ms|s|MB|%))?|%|\b(?:N\+1|REST(?:ful)?|API(?:s)?|RAG|LLM|RBAC|SOLID|HMAC|SLA|OpenAPI|Swagger|Postman|PostgreSQL|Postgres|pgvector|Redis|Docker|Laravel(?:\s+\d+)?|Filament(?:\s+v?\d+)?|Horizon|OpenRouter|Prism|Stripe|Moyasar|Tap|OpenAI|Vue(?:\s*\d+)?|PHP|GitHub|Sanctum|JSON|JSONB|cURL|Telegram|TikTok|Snapchat|LinkedIn|Google\s+Ads|Meta|n8n|FirstTouch|Sanabel(?:\s+IQ)?|OWASP(?:\s+ZAP)?|Dusk|k6|ROAS|SaaS|CI\/CD|AdPilot|Scrum(?:\s+Master)?|Areisto|Clean\s+Architecture|Composition\s+API|Backend|B2B|Livewire|PIN)(?:\/[A-Za-z]+)?\b|[A-Za-z][\w]*(?:\/[\w.]+)+(?:\.php)?|[A-Za-z]\w*::\w+|\/v\d+\/[\w\-\/]+|"cached"\s*:\s*true|200\s+OK|routes\/api\.php/gi,
+      /(?:&lt;\s*)?\d+(?:\.\d+)?(?:\s*(?:ms|s|MB|%))?|%|\b(?:N\+1|REST(?:ful)?|API(?:s)?|RAG|LLM|RBAC|SOLID|HMAC|OpenAPI|Swagger|Postman|PostgreSQL|Postgres|pgvector|Redis|Docker|Laravel(?:\s+\d+)?|Filament(?:\s+v?\d+)?|Horizon|OpenRouter|Prism|Stripe|Moyasar|Tap|OpenAI|Vue(?:\s*\d+)?|Next\.js(?:\s+\d+)?|Neon|Drizzle|Auth\.js|Netlify|R2|ILS|JWT|B2C|HTTP|FOR\s+UPDATE|Leads|Queue\s+Workers|Overselling|Multi\s+tenancy|Serverless|Full\s+Stack|ATS|PDF|PHP|GitHub|Sanctum|JSON|JSONB|cURL|Telegram|TikTok|Snapchat|LinkedIn|Google(?:\s+Ads)?|Meta|X|n8n|FirstTouch(?:\s+SLA)?|SLA|Sanabel(?:\s+IQ)?|OWASP(?:\s+ZAP)?|Dusk|k6|ROAS|SaaS|CI\/CD|AdPilot|Scrum(?:\s+Master)?|Areisto|Clean\s+Architecture|Composition\s+API|Backend|B2B|RTL|Livewire|PIN)(?:\/[A-Za-z]+)?\b|[A-Za-z][\w]*(?:\/[\w.]+)+(?:\.php)?|[A-Za-z]\w*::\w+|\/v\d+\/[\w\-\/]+|"cached"\s*:\s*true|200\s+OK|routes\/api\.php/gi,
       (match) => `<bdi dir="ltr">${match}</bdi>`
     );
   }
@@ -77,8 +89,9 @@ return cache()->remember('metrics', 60, fn () =>
 
   function syncThemeButtons(pref, lang) {
     const t = I18N[lang] || I18N.en;
-    const group = $(".theme-toggle");
-    if (group) group.setAttribute("aria-label", t.theme?.label || "Theme");
+    $$(".theme-toggle").forEach((group) => {
+      group.setAttribute("aria-label", t.theme?.label || "Theme");
+    });
     $$("[data-theme-pref]").forEach((btn) => {
       const mode = btn.dataset.themePref;
       const active = mode === pref;
@@ -170,11 +183,21 @@ return cache()->remember('metrics', 60, fn () =>
         .map((li) => `<li>${lang === "ar" ? isolateTechHtml(li) : escapeHtml(li)}</li>`)
         .join("");
       setTechText($(".benefit", block), item.benefit, lang);
+      const cta = $("[data-service-cta]", block);
+      if (cta) {
+        cta.textContent = t.services.cta || I18N.en.services.cta;
+        const template =
+          t.services.waPrefillTemplate || I18N.en.services.waPrefillTemplate;
+        cta.setAttribute("href", waUrl(template.replace("{package}", item.title)));
+      }
     });
+
+    syncWhatsAppLinks(lang);
 
     const cases = $$("[data-case]");
     t.portfolio.cases.forEach((item, i) => {
-      const card = cases[i];
+      const card =
+        (item.id && $(`[data-case][data-project="${item.id}"]`)) || cases[i];
       if (!card) return;
       const tags = $(".case-tags", card);
       tags.innerHTML = item.tags
@@ -213,25 +236,24 @@ return cache()->remember('metrics', 60, fn () =>
       const link = $(".case-link", card);
       if (link) {
         link.textContent = item.link;
-        link.href = item.href;
-        if (item.href && item.href !== "#") {
+        link.href = item.href || "#";
+        if (item.href && /^https?:/i.test(item.href)) {
           link.setAttribute("target", "_blank");
           link.setAttribute("rel", "noopener noreferrer");
+        } else {
+          link.removeAttribute("target");
+          link.removeAttribute("rel");
         }
       }
+
     });
 
-    const whyItems = $$("[data-why]");
-    t.why.items.forEach((item, i) => {
-      const el = whyItems[i];
-      if (!el) return;
-      setTechText($("h3", el), item.title, lang);
-      setTechText($("p", el), item.text, lang);
-    });
+    // Gallery sync owns preview image src/alt (hero first, then switcher)
+    window.YZFeatures?.syncCaseGalleries?.(t.portfolio.cases);
 
     const aboutPs = $$("[data-about-p]");
-    ["p1", "p2", "p3"].forEach((key, i) => {
-      if (aboutPs[i]) setTechText(aboutPs[i], t.about[key], lang);
+    ["p1", "p2"].forEach((key, i) => {
+      if (aboutPs[i] && t.about[key]) setTechText(aboutPs[i], t.about[key], lang);
     });
 
     const testimonials = $$("[data-testimonial]");
@@ -253,7 +275,7 @@ return cache()->remember('metrics', 60, fn () =>
     });
 
     // Isolate technical tokens in static i18n titles that mix Latin + Arabic
-    $$("[data-i18n='rigor.title'], [data-i18n='hero.lead'], [data-i18n='cmd.hint']").forEach((el) => {
+    $$("[data-i18n='rigor.title'], [data-i18n='hero.headline'], [data-i18n='hero.lead'], [data-i18n='cmd.hint']").forEach((el) => {
       const key = el.getAttribute("data-i18n");
       const value = tPath(t, key);
       if (typeof value === "string" && lang === "ar") el.innerHTML = isolateTechHtml(value);
@@ -291,21 +313,33 @@ return cache()->remember('metrics', 60, fn () =>
     if ($("#cmd-palette")?.classList.contains("is-open") && window.YZFeatures?.refreshCmd) {
       window.YZFeatures.refreshCmd(cmdInput?.value || "");
     }
+    window.YZFeatures?.syncCmdFooterLabel?.();
 
-    document.title =
+    const pageTitle =
       lang === "ar"
-        ? "يوسف زقوت | مهندس Backend"
-        : "Yousef Zaqout | Backend Engineer";
+        ? "يوسف زقوت | مهندس برمجيات متخصص Backend وواجهات API عالية الأداء"
+        : "Yousef Zaqout | High Performance Laravel APIs, Payments, and AI Workflows";
+    const pageDesc =
+      lang === "ar"
+        ? "أساعد المؤسسين وفرق التطوير على بناء Backend موثوق وجاهز للإنتاج بـ Laravel، متكامل مع بوابات الدفع وتوثيق API واضح."
+        : "I help tech founders and product teams launch reliable Laravel backends ready for production, complete with payments and clear API docs.";
+
+    document.title = pageTitle;
 
     const metaDesc = $('meta[name="description"]');
-    if (metaDesc) {
-      metaDesc.setAttribute(
-        "content",
-        lang === "ar"
-          ? "واجهات Laravel RESTful، خطوط دفع وذكاء اصطناعي/RAG، توثيق OpenAPI، وتسليم Docker."
-          : "Laravel RESTful APIs, payment & AI/RAG pipelines, OpenAPI docs, Docker delivery."
-      );
-    }
+    if (metaDesc) metaDesc.setAttribute("content", pageDesc);
+
+    const syncMeta = (sel, attr, value) => {
+      const el = $(sel);
+      if (el) el.setAttribute(attr, value);
+    };
+    syncMeta('meta[property="og:title"]', "content", pageTitle);
+    syncMeta('meta[property="og:description"]', "content", pageDesc);
+    syncMeta('meta[property="og:image:alt"]', "content", pageTitle);
+    syncMeta('meta[name="twitter:title"]', "content", pageTitle);
+    syncMeta('meta[name="twitter:description"]', "content", pageDesc);
+    syncMeta('meta[name="twitter:image:alt"]', "content", pageTitle);
+    syncMeta('meta[property="og:locale"]', "content", lang === "ar" ? "ar_AR" : "en_US");
   }
 
   /* —— Copy code —— */

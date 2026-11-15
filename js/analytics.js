@@ -12,6 +12,16 @@
  *   </script>
  */
 window.YZAnalytics = (function () {
+  /**
+   * P3 conversion success events (GA4 / PostHog).
+   * Track these as primary goals for a 1-week baseline vs next week.
+   */
+  const SUCCESS_EVENTS = Object.freeze({
+    CTA_WHATSAPP: "cta_whatsapp",
+    SANDBOX_AUTORUN: "sandbox_autorun",
+    SERVICE_CTA: "service_cta",
+  });
+
   function cleanEnv(value, fallback = "") {
     const v = String(value ?? "").trim();
     if (!v || v.includes("%VITE_")) return fallback;
@@ -160,5 +170,5 @@ window.YZAnalytics = (function () {
     init();
   }
 
-  return { track, init, CONFIG };
+  return { track, init, CONFIG, SUCCESS_EVENTS };
 })();
